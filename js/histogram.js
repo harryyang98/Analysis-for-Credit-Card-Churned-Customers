@@ -78,9 +78,7 @@ class Histogram {
     vis.xValue = d => d.key;
     vis.yValue = d => d.count;
 
-  // And apply this function to data to get the bins
-    // vis.bins = histogram(vis.data);
-    console.log(vis.aggregatedData);
+    // console.log(vis.aggregatedData);
 
     vis.xScale.domain(vis.aggregatedData.map(vis.xValue));
     vis.yScale.domain([0, d3.max(vis.aggregatedData, vis.yValue)]);

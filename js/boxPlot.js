@@ -105,7 +105,7 @@ class BoxPlot {
     record["counts"] = groupCounts["churned"];
     record["quartile"] = boxQuartiles(groupCounts["churned"]);
     record["whiskers"] = [localMin, localMax];
-    record["color"] = "blue";
+    record["color"] = "steelblue";
 
     function boxQuartiles(d) {
       return [
@@ -123,10 +123,10 @@ class BoxPlot {
    record["counts"] = groupCounts["unchurned"];
    record["quartile"] = boxQuartiles(groupCounts["unchurned"]);
    record["whiskers"] = [localMin, localMax];
-   record["color"] = "blue";
+   record["color"] = "steelblue";
    vis.boxPlotData.push(record);
  
-    console.log(vis.boxPlotData);
+    // console.log(vis.boxPlotData);
     // Compute an ordinal xScale for the keys in boxPlotData
     vis.xScale.domain(Object.keys(groupCounts));
     // Compute a global y scale based on the global counts
@@ -204,7 +204,7 @@ class BoxPlot {
         .attr("x2", vis.horizontalLineConfigs[i].x2)
         .attr("y2", vis.horizontalLineConfigs[i].y2)
         .attr("stroke", "#000")
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 2)
         .attr("fill", "none");
     }
     
