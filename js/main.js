@@ -20,13 +20,12 @@ d3.csv('data/BankChurners.csv').then(data => {
     Object.keys(d).forEach(attr => {
       if (attr == 'Customer_Age') {
         d[attr] = (d[attr] == 'NA') ? null : +d[attr];
-      } else if (attr != 'Attrition_Flag' && attr != 'Dependent_count' && attr != 'gender') {
+      } else if (attr != 'Attrition_Flag' && attr != 'Dependent_count') {
         d[attr] = +d[attr];
       }
     });
   });
 
-  data.sort((a, b) => a.label - b.label);
 
   const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data);
   const histogram = new Histogram({parentElement: '#histogram'}, data);

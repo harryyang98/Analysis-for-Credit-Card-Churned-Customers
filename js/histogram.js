@@ -42,16 +42,12 @@ class Histogram {
     vis.yScale = d3.scaleLinear()
         .range([vis.height, 0]);
     vis.yAxis = d3.axisLeft(vis.yScale);
-        // .tickSize(-vis.width);
     vis.yAxisG = vis.chartArea.append('g')
         .attr('class', 'axis y-axis');
-
 
     vis.xScale = d3.scaleBand()
         .range([0, vis.width]);
     vis.xAxis = d3.axisBottom(vis.xScale);
-        // .ticks(5)
-        // .tickSize(-vis.height);
     vis.xAxisG = vis.chartArea.append('g')
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
@@ -62,8 +58,10 @@ class Histogram {
   updateVis() {
     // Prepare data and scales
     let vis = this;
+    
     let factor = this.factor;
     // Prepare data: count number of leaders in each category
+    vis.data.sort((a, b) => a[factor] - b[factor]);
     // i.e. [{ key: 'male', count: 10 }, {key: 'female', 20}
     const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d[factor]);
     vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
@@ -78,10 +76,11 @@ class Histogram {
     vis.xValue = d => d.key;
     vis.yValue = d => d.count;
 
-    // console.log(vis.aggregatedData);
-
     vis.xScale.domain(vis.aggregatedData.map(vis.xValue));
-    vis.yScale.domain([0, d3.max(vis.aggregatedData, vis.yValue)]);
+    vis.yScale.domain([0, d3.max(vis.aggregatedData1, vis.yValue)]);
+
+    // console.log(vis.aggregatedData1);
+
     vis.renderVis();
   }
 
@@ -89,7 +88,8 @@ class Histogram {
     // Bind data to visual elements, update axes
     let vis = this;
 
-    var rect1 = vis.chartArea.selectAll("rect")
+    //histogram of unchurned
+    const rect1 = vis.chartArea.selectAll("rect")
     .data(vis.aggregatedData1, vis.xValue)		
     .join("rect")	
     .attr("fill","steelblue")		
@@ -97,37 +97,39 @@ class Histogram {
         .attr('width', vis.xScale.bandwidth())
         .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
         .attr('y', d => vis.yScale(vis.yValue(d)))
-        .attr("stroke", "#000")
-        .style('opacity',.5)
-        .attr("stroke-width", .2);
+        .style('opacity',.4);
     
         vis.chartArea.append('text')
         .attr('class', 'axis-title')
-        .attr('y', -10)
+        .attr('y', -15)
         .attr('x', vis.width/2)
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text('unchurned');
 
-    // var rect2 = vis.chartArea.selectAll("rect")
-    // .data(vis.aggregatedData2, vis.xValue)		
-    // .join("rect")	
-    // .attr("fill","red")		
-    // .attr('x', d => vis.xScale(vis.xValue(d)))
-    //     .attr('width', vis.xScale.bandwidth())
-    //     .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
-    //     .attr('y', d => vis.yScale(vis.yValue(d)))
-    //     .style('opacity',.5)
-    //     .attr("stroke", "#000")
-    //     .attr("stroke-width", .2);
+    //histogram of churned
+    const rect2 = vis.chartArea.selectAll("rect")
+    .data(vis.aggregatedData2, vis.xValue)		
+    .join("rect")	
+    .attr("fill","red")		
+    .attr('x', d => vis.xScale(vis.xValue(d)))
+        .attr('width', vis.xScale.bandwidth())
+        .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
+        .attr('y', d => vis.yScale(vis.yValue(d)))
+        .style('opacity',.4);
 
-    // vis.chartArea.append('text')
-    // .attr('class', 'axis-title')
-    // .attr('y', -10)
-    // .attr('x', vis.width/2)
-    // .attr('dy', '.71em')
-    // .style('text-anchor', 'end')
-    // .text('churned');
+    vis.chartArea.append('text')
+    .attr('class', 'axis-title')
+    .attr('y', -15)
+    .attr('x', vis.width/2)
+    .attr('dy', '.71em')
+    .style('text-anchor', 'end')
+    .text('churned');
+
+    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
+    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "red").style('opacity',.4)
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 60).text("churned").style("font-size", "15px").attr("alignment-baseline","middle")
 
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());
