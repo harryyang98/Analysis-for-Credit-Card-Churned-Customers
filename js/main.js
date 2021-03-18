@@ -29,6 +29,7 @@ d3.csv('data/BankChurners.csv').then(data => {
   data.sort((a, b) => a.label - b.label);
 
   const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data);
+  const histogram = new Histogram({parentElement: '#histogram'}, data);
 
   d3.select('#quantFactor-selector').on('change', () => {
     const option = d3.select('#quantFactor-selector').property('value');
@@ -36,6 +37,9 @@ d3.csv('data/BankChurners.csv').then(data => {
     boxPlot.factor = option;
     boxPlot.boxPlotData = [];
     boxPlot.updateVis();
+
+    histogram.factor = option;
+    histogram.updateVis();
 
   })
 
