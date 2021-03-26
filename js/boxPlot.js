@@ -104,8 +104,9 @@ class BoxPlot {
     record["key"] = "churned";
     record["counts"] = groupCounts["churned"];
     record["quartile"] = boxQuartiles(groupCounts["churned"]);
-    record["whiskers"] = [localMin, localMax];
+    record["whiskers"] = findWhiskerRange();
     record["color"] = "steelblue";
+    console.log(record.whiskers)
 
     function boxQuartiles(d) {
       return [
@@ -113,6 +114,14 @@ class BoxPlot {
         d3.quantile(d, .5),
         d3.quantile(d, .75)
       ];
+    }
+    function findWhiskerRange() {
+      const interQuantileRange = record.quartile[2] - record.quartile[0]
+      let max = record.quartile[2] + 1.5 * interQuantileRange
+      max = Math.min(max, localMax)
+      let min = record.quartile[0] - 1.5 * interQuantileRange
+      min = Math.max(min, localMin)
+      return [min, max]
     }
 
     vis.boxPlotData.push(record);
@@ -122,9 +131,10 @@ class BoxPlot {
     record["key"] = "unchurned";
     record["counts"] = groupCounts["unchurned"];
     record["quartile"] = boxQuartiles(groupCounts["unchurned"]);
-    record["whiskers"] = [localMin, localMax];
+    record["whiskers"] = findWhiskerRange();
     record["color"] = "steelblue";
     vis.boxPlotData.push(record);
+
 
     // console.log(vis.boxPlotData);
     // Compute an ordinal xScale for the keys in boxPlotData
@@ -135,7 +145,6 @@ class BoxPlot {
     // console.log(min);
     // console.log(max);
     vis.yScale.domain([min, max]);
-    console.log(vis.boxPlotData)
     vis.renderVis();
   }
 
@@ -194,21 +203,33 @@ class BoxPlot {
       }
     ];
 
+    vis.chartArea.selectAll(".hi")
+        .data(vis.boxPlotData)
+        .join("line")
+        .attr("class", "hi")
+        .attr("x1", d => vis.xScale(d.key))
+        .attr("y1", d => vis.yScale(d.quartile[1]))
+        .attr("x2", d => vis.xScale(d.key) + vis.config.barWidth)
+        .attr("y2", d => vis.yScale(d.quartile[1]))
+        .attr("stroke", "#fad")
+        .attr("stroke-width", 2)
+        .attr("fill", "none");
 
-    for(var i=0; i < vis.horizontalLineConfigs.length; i++) {
-      // Draw the whiskers at the lowest, highest and mean for the series
-      var horizontalLine = vis.chartArea.selectAll(".hi")
-          .data(vis.boxPlotData)
-          .join("line")
-          .attr("class","hi")
-          .attr("x1", vis.horizontalLineConfigs[i].x1)
-          .attr("y1", vis.horizontalLineConfigs[i].y1)
-          .attr("x2", vis.horizontalLineConfigs[i].x2)
-          .attr("y2", vis.horizontalLineConfigs[i].y2)
-          .attr("stroke", "#000")
-          .attr("stroke-width", 2)
-          .attr("fill", "none");
-    }
+
+    // for(var i=0; i < vis.horizontalLineConfigs.length; i++) {
+    //   // Draw the whiskers at the lowest, highest and mean for the series
+    //   var horizontalLine = vis.chartArea.selectAll(".hi")
+    //       .data(vis.boxPlotData)
+    //       .join("line")
+    //       .attr("class","hi")
+    //       .attr("x1", vis.horizontalLineConfigs[i].x1)
+    //       .attr("y1", vis.horizontalLineConfigs[i].y1)
+    //       .attr("x2", vis.horizontalLineConfigs[i].x2)
+    //       .attr("y2", vis.horizontalLineConfigs[i].y2)
+    //       .attr("stroke", "#000")
+    //       .attr("stroke-width", 2)
+    //       .attr("fill", "none");
+    // }
 
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());
