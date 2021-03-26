@@ -25,7 +25,7 @@ class BoxPlot {
     this.horizontalLineConfigs=null;
     this.initVis();
   }
-  
+
   initVis() {
     // Create SVG area, initialize scales and axes
     let vis = this;
@@ -37,16 +37,16 @@ class BoxPlot {
     // Append group element that will contain our actual chart
     // and position it according to the given margin config
     vis.chartArea = vis.svg.append('g')
-    .attr('transform', `translate(${vis.config.margin.left+5},${vis.config.margin.top})`);
+        .attr('transform', `translate(${vis.config.margin.left+5},${vis.config.margin.top})`);
 
     vis.chart = vis.chartArea.append('g');
 
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
-    
+
     // Move the left axis over 25 pixels, and the top axis over 35 pixels
-    
+
     vis.yScale = d3.scaleLinear()
         .range([vis.height, 0]);
     vis.yAxis = d3.axisLeft(vis.yScale)
@@ -74,17 +74,17 @@ class BoxPlot {
     const globalCounts = [];
 
     let factor = this.factor;
-      groupCounts["unchurned"] = [];
-      vis.unchurned.forEach(d => {
-        groupCounts["unchurned"].push(d[factor]);
-        globalCounts.push(d[factor]);
-      })
+    groupCounts["unchurned"] = [];
+    vis.unchurned.forEach(d => {
+      groupCounts["unchurned"].push(d[factor]);
+      globalCounts.push(d[factor]);
+    })
 
-      groupCounts["churned"] = [];
-      vis.churned.forEach(d => {
-        groupCounts["churned"].push(d[factor]);
-        globalCounts.push(d[factor]);
-      })
+    groupCounts["churned"] = [];
+    vis.churned.forEach(d => {
+      groupCounts["churned"].push(d[factor]);
+      globalCounts.push(d[factor]);
+    })
     console.log(groupCounts);
 
     // Sort group counts so quantile methods work
@@ -95,7 +95,7 @@ class BoxPlot {
     function sortNumber(a,b) {
       return a - b;
     }
-        // Prepare the data for the box plots
+    // Prepare the data for the box plots
 
     // console.log(groupCounts["churned"]);
     var record = {};
@@ -113,19 +113,19 @@ class BoxPlot {
         d3.quantile(d, .5),
         d3.quantile(d, .75)
       ];
-   }
+    }
 
-   vis.boxPlotData.push(record);
-   var record = {};
-   var localMin = d3.min(groupCounts["unchurned"]);
-   var localMax = d3.max(groupCounts["unchurned"]);
-   record["key"] = "unchurned";
-   record["counts"] = groupCounts["unchurned"];
-   record["quartile"] = boxQuartiles(groupCounts["unchurned"]);
-   record["whiskers"] = [localMin, localMax];
-   record["color"] = "steelblue";
-   vis.boxPlotData.push(record);
- 
+    vis.boxPlotData.push(record);
+    var record = {};
+    var localMin = d3.min(groupCounts["unchurned"]);
+    var localMax = d3.max(groupCounts["unchurned"]);
+    record["key"] = "unchurned";
+    record["counts"] = groupCounts["unchurned"];
+    record["quartile"] = boxQuartiles(groupCounts["unchurned"]);
+    record["whiskers"] = [localMin, localMax];
+    record["color"] = "steelblue";
+    vis.boxPlotData.push(record);
+
     // console.log(vis.boxPlotData);
     // Compute an ordinal xScale for the keys in boxPlotData
     vis.xScale.domain(Object.keys(groupCounts));
@@ -135,7 +135,7 @@ class BoxPlot {
     // console.log(min);
     // console.log(max);
     vis.yScale.domain([min, max]);
-
+    console.log(vis.boxPlotData)
     vis.renderVis();
   }
 
@@ -145,27 +145,29 @@ class BoxPlot {
 
     // Draw the box plot vertical lines
     const verticalLines = vis.chartArea.selectAll(".verticalLines")
-      .data(vis.boxPlotData)
-      .join("line")
-      .attr('x1', d => vis.xScale(d.key) + vis.config.barWidth/2)
-      .attr('y1', d => vis.yScale(d.whiskers[0]))
-      .attr('x2', d => vis.xScale(d.key) + vis.config.barWidth/2)
-      .attr('y2', d => vis.yScale(d.whiskers[1]))
-      .attr('stroke', "#001")
-      .attr('stroke-width', 1)
-      .attr('fill', 'none');
+        .data(vis.boxPlotData)
+        .join("line")
+        .attr('class', 'verticalLines')
+        .attr('x1', d => vis.xScale(d.key) + vis.config.barWidth/2)
+        .attr('y1', d => vis.yScale(d.whiskers[0]))
+        .attr('x2', d => vis.xScale(d.key) + vis.config.barWidth/2)
+        .attr('y2', d => vis.yScale(d.whiskers[1]))
+        .attr('stroke', "#001")
+        .attr('stroke-width', 1)
+        .attr('fill', 'none');
+
 
     // Draw the boxes of the box plot, filled in white and on top of vertical lines
     const rects = vis.chartArea.selectAll("rect")
-      .data(vis.boxPlotData)
-      .join('rect')
-      .attr("width", vis.config.barWidth)
-      .attr("height", d => vis.yScale(d.quartile[0]) - vis.yScale(d.quartile[2]))
-      .attr("x", d => vis.xScale(d.key))
-      .attr("y", d => vis.yScale(d.quartile[2]))
-      .attr("fill", d => d.color)
-      .attr("stroke", "#002")
-      .attr("stroke-width", 1);
+        .data(vis.boxPlotData)
+        .join('rect')
+        .attr("width", vis.config.barWidth)
+        .attr("height", d => vis.yScale(d.quartile[0]) - vis.yScale(d.quartile[2]))
+        .attr("x", d => vis.xScale(d.key))
+        .attr("y", d => vis.yScale(d.quartile[2]))
+        .attr("fill", d => d.color)
+        .attr("stroke", "#002")
+        .attr("stroke-width", 1);
 
     // Now render all the horizontal lines at once - the whiskers and the median
     vis.horizontalLineConfigs = [
@@ -192,28 +194,28 @@ class BoxPlot {
       }
     ];
 
-  
+
     for(var i=0; i < vis.horizontalLineConfigs.length; i++) {
       // Draw the whiskers at the lowest, highest and mean for the series
-      var horizontalLine = vis.chartArea.selectAll("whiskers")
-        .data(vis.boxPlotData)
-        .join("line")
-        .attr("class","hi")
-        .attr("x1", vis.horizontalLineConfigs[i].x1)
-        .attr("y1", vis.horizontalLineConfigs[i].y1)
-        .attr("x2", vis.horizontalLineConfigs[i].x2)
-        .attr("y2", vis.horizontalLineConfigs[i].y2)
-        .attr("stroke", "#000")
-        .attr("stroke-width", 2)
-        .attr("fill", "none");
+      var horizontalLine = vis.chartArea.selectAll(".hi")
+          .data(vis.boxPlotData)
+          .join("line")
+          .attr("class","hi")
+          .attr("x1", vis.horizontalLineConfigs[i].x1)
+          .attr("y1", vis.horizontalLineConfigs[i].y1)
+          .attr("x2", vis.horizontalLineConfigs[i].x2)
+          .attr("y2", vis.horizontalLineConfigs[i].y2)
+          .attr("stroke", "#000")
+          .attr("stroke-width", 2)
+          .attr("fill", "none");
     }
-    
+
     vis.xAxisG.call(vis.xAxis)
-    .call(g => g.select('.domain').remove());
-  
+        .call(g => g.select('.domain').remove());
+
     vis.yAxisG.call(vis.yAxis)
-    .call(g => g.select('.domain').remove());
+        .call(g => g.select('.domain').remove());
   }
-  
+
 }
     
