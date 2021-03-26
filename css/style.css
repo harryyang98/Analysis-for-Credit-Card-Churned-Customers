@@ -10,6 +10,17 @@
     font-weight: bold;
 }
 
+.boxPointLayer
+{
+    fill: darkslateblue;
+    fill-opacity: 30%;
+}
+.boxPointLayer.unchurned
+{
+    fill: pink;
+    fill-opacity: 30%;
+}
+
 /* Tooltip */
 #tooltip {
     position: absolute;

@@ -10,7 +10,7 @@ class BoxPlot {
       parentElement: _config.parentElement,
       containerWidth: 350,
       containerHeight: 350,
-      barWidth: 30,
+      barWidth: 65,
       margin: { top: 20, right: 10, bottom: 20, left: 15 },
 
       tooltipPadding: _config.tooltipPadding || 25
@@ -54,14 +54,14 @@ class BoxPlot {
     vis.yAxisG = vis.chartArea.append('g')
         .attr('class', 'axis y-axis');
 
-    vis.xScale = d3.scalePoint()
+    vis.xScale = d3.scaleBand()
         .range([0, vis.width])
         .padding([0.5]);
     vis.xAxis = d3.axisBottom(vis.xScale)
-        .tickSize(0);
+        .tickSize(-vis.height);
     vis.xAxisG = vis.chartArea.append('g')
         .attr('class', 'axis x-axis')
-        .attr('transform', `translate(15, ${vis.height})`);
+        .attr('transform', `translate(0, ${vis.height})`);
 
     vis.updateVis();
   }
@@ -85,7 +85,6 @@ class BoxPlot {
       groupCounts["churned"].push(d[factor]);
       globalCounts.push(d[factor]);
     })
-    console.log(groupCounts);
 
     // Sort group counts so quantile methods work
     for(var key in groupCounts) {
@@ -106,7 +105,6 @@ class BoxPlot {
     record["quartile"] = boxQuartiles(groupCounts["churned"]);
     record["whiskers"] = findWhiskerRange();
     record["color"] = "steelblue";
-    console.log(record.whiskers)
 
     function boxQuartiles(d) {
       return [
@@ -142,9 +140,14 @@ class BoxPlot {
     // Compute a global y scale based on the global counts
     var min = d3.min(globalCounts);
     var max = d3.max(globalCounts);
-    // console.log(min);
-    // console.log(max);
-    vis.yScale.domain([min, max]);
+
+    vis.yScale.domain([0, max]);
+
+    vis.filteredData = {
+      churned: groupCounts.churned,
+      unchurned: groupCounts.unchurned
+    }
+
     vis.renderVis();
   }
 
@@ -178,31 +181,6 @@ class BoxPlot {
         .attr("stroke", "#002")
         .attr("stroke-width", 1);
 
-    // Now render all the horizontal lines at once - the whiskers and the median
-    vis.horizontalLineConfigs = [
-      // Top whisker
-      {
-        x1: d => vis.xScale(d.key),
-        y1: d => vis.yScale(d.whiskers[0]),
-        x2: d => vis.xScale(d.key) + vis.config.barWidth,
-        y2: d => vis.yScale(d.whiskers[0])
-      },
-      // Median line
-      {
-        x1: d => vis.xScale(d.key),
-        y1: d => vis.yScale(d.quartile[1]),
-        x2: d => vis.xScale(d.key) + vis.config.barWidth,
-        y2: d => vis.yScale(d.quartile[1])
-      },
-      // Bottom whisker
-      {
-        x1: d => vis.xScale(d.key),
-        y1: d => vis.yScale(d.whiskers[1]),
-        x2: d => vis.xScale(d.key) + vis.config.barWidth,
-        y2: d => vis.yScale(d.whiskers[1])
-      }
-    ];
-
     vis.chartArea.selectAll(".hi")
         .data(vis.boxPlotData)
         .join("line")
@@ -216,23 +194,57 @@ class BoxPlot {
         .attr("fill", "none");
 
 
-    // for(var i=0; i < vis.horizontalLineConfigs.length; i++) {
-    //   // Draw the whiskers at the lowest, highest and mean for the series
-    //   var horizontalLine = vis.chartArea.selectAll(".hi")
-    //       .data(vis.boxPlotData)
-    //       .join("line")
-    //       .attr("class","hi")
-    //       .attr("x1", vis.horizontalLineConfigs[i].x1)
-    //       .attr("y1", vis.horizontalLineConfigs[i].y1)
-    //       .attr("x2", vis.horizontalLineConfigs[i].x2)
-    //       .attr("y2", vis.horizontalLineConfigs[i].y2)
-    //       .attr("stroke", "#000")
-    //       .attr("stroke-width", 2)
-    //       .attr("fill", "none");
-    // }
+    let prev, curr, count = null
+    vis.chartArea.selectAll("circle")
+        .data(vis.filteredData.unchurned)
+        .join("circle")
+        .attr("class", "boxPointLayer unchurned")
+        .attr("cx", d => {
+          curr = d;
+          if (prev === null) {
+            prev = d;
+            count = 1;
+          } else {
+            if (prev === curr) {
+              count++
+            } else {
+              count = 0
+            }
+          }
+          prev = d
+          return vis.xScale("unchurned") + 0.5*count + 1/2 * vis.config.barWidth
+        })
+        .attr("cy", d => vis.yScale(d))
+        .attr("r", 2);
+
+    // prev = null
+    // count = 0
+    // vis.chartArea.selectAll("circle")
+    //     .data(vis.filteredData.churned)
+    //     .join("circle")
+    //     .attr("class", "boxPointLayer")
+    //     .attr("cx", d => {
+    //       curr = d;
+    //       if (prev === null) {
+    //         prev = d;
+    //         count = 1;
+    //       } else {
+    //         if (prev === curr) {
+    //           count++
+    //         } else {
+    //           count = 0
+    //         }
+    //       }
+    //       prev = d
+    //       return vis.xScale("churned") + 0.5*count + 1/2 * vis.config.barWidth
+    //     })
+    //     .attr("cy", d => vis.yScale(d))
+    //     .attr("r", 2);
+
+
 
     vis.xAxisG.call(vis.xAxis)
-        .call(g => g.select('.domain').remove());
+        // .call(g => g.select('.domain').remove());
 
     vis.yAxisG.call(vis.yAxis)
         .call(g => g.select('.domain').remove());
