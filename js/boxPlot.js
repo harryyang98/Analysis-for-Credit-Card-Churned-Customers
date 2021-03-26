@@ -63,6 +63,7 @@ class BoxPlot {
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
 
+
     vis.updateVis();
   }
 
@@ -142,11 +143,37 @@ class BoxPlot {
     var max = d3.max(globalCounts);
 
     vis.yScale.domain([0, max]);
+    vis.histogram = d3.histogram()
+        .domain(vis.yScale.domain())
+        .thresholds(vis.yScale.ticks(20))
+        .value(d => d)
 
-    vis.filteredData = {
-      churned: groupCounts.churned,
-      unchurned: groupCounts.unchurned
+    let maxNum = 0
+    let churnedTemp = vis.churned.map(d => d[factor])
+
+    vis.churnedBin = vis.histogram(churnedTemp)
+
+    let unchurnedTemp = vis.unchurned.map(d => d[factor])
+    vis.unchurnedBin = vis.histogram(unchurnedTemp)
+
+    let lengths = vis.churnedBin.map(d => d.length)
+
+    maxNum = d3.max(lengths)
+
+    lengths = vis.unchurnedBin.map(d => d.length)
+
+    let tempMax = d3.max(lengths)
+
+    if (tempMax > maxNum) {
+      maxNum = tempMax
     }
+
+
+    vis.xNum = d3.scaleLinear()
+        .range([0, vis.xScale.bandwidth()])
+        .domain([-maxNum, maxNum])
+    console.log(vis.xScale.bandwidth())
+
 
     vis.renderVis();
   }
@@ -154,6 +181,36 @@ class BoxPlot {
   renderVis() {
     // Bind data to visual elements, update axes
     let vis = this;
+
+    vis.chartArea.selectAll(".churnedViolin")
+        .data([vis.churnedBin])
+        .join("path")
+        .attr("class", "churnedViolin")
+        .style("stroke", "none")
+        .style("fill","#69b3a2")
+        .attr("d", d3.area()
+            .x0(d => {
+              return vis.xNum(-d.length)
+            })
+            .x1(d => vis.xNum(d.length))
+            .y(d => vis.yScale(d.x0))
+            .curve(d3.curveCatmullRom))
+        .attr("transform", `translate(${vis.xScale("churned")}, 0)`)
+
+    vis.chartArea.selectAll(".unchurnedViolin")
+        .data([vis.unchurnedBin])
+        .join("path")
+        .attr("class", "unchurnedViolin")
+        .style("stroke", "none")
+        .style("fill","#69b3a2")
+        .attr("d", d3.area()
+            .x0(d => {
+              return vis.xNum(-d.length)
+            })
+            .x1(d => vis.xNum(d.length))
+            .y(d => vis.yScale(d.x0))
+            .curve(d3.curveCatmullRom))
+        .attr("transform", `translate(${vis.xScale("unchurned")}, 0)`)
 
     // Draw the box plot vertical lines
     const verticalLines = vis.chartArea.selectAll(".verticalLines")
@@ -181,65 +238,19 @@ class BoxPlot {
         .attr("stroke", "#002")
         .attr("stroke-width", 1);
 
-    vis.chartArea.selectAll(".hi")
+    vis.chartArea.selectAll(".avg")
         .data(vis.boxPlotData)
         .join("line")
-        .attr("class", "hi")
+        .attr("class", "avg")
         .attr("x1", d => vis.xScale(d.key))
         .attr("y1", d => vis.yScale(d.quartile[1]))
         .attr("x2", d => vis.xScale(d.key) + vis.config.barWidth)
         .attr("y2", d => vis.yScale(d.quartile[1]))
-        .attr("stroke", "#fad")
         .attr("stroke-width", 2)
         .attr("fill", "none");
 
 
-    let prev, curr, count = null
-    vis.chartArea.selectAll("circle")
-        .data(vis.filteredData.unchurned)
-        .join("circle")
-        .attr("class", "boxPointLayer unchurned")
-        .attr("cx", d => {
-          curr = d;
-          if (prev === null) {
-            prev = d;
-            count = 1;
-          } else {
-            if (prev === curr) {
-              count++
-            } else {
-              count = 0
-            }
-          }
-          prev = d
-          return vis.xScale("unchurned") + 0.5*count + 1/2 * vis.config.barWidth
-        })
-        .attr("cy", d => vis.yScale(d))
-        .attr("r", 2);
 
-    // prev = null
-    // count = 0
-    // vis.chartArea.selectAll("circle")
-    //     .data(vis.filteredData.churned)
-    //     .join("circle")
-    //     .attr("class", "boxPointLayer")
-    //     .attr("cx", d => {
-    //       curr = d;
-    //       if (prev === null) {
-    //         prev = d;
-    //         count = 1;
-    //       } else {
-    //         if (prev === curr) {
-    //           count++
-    //         } else {
-    //           count = 0
-    //         }
-    //       }
-    //       prev = d
-    //       return vis.xScale("churned") + 0.5*count + 1/2 * vis.config.barWidth
-    //     })
-    //     .attr("cy", d => vis.yScale(d))
-    //     .attr("r", 2);
 
 
 

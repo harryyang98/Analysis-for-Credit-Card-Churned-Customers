@@ -21,6 +21,21 @@
     fill-opacity: 30%;
 }
 
+line.avg
+{
+    stroke: coral;
+}
+
+rect
+{
+    fill-opacity: 70%;
+}
+
+path
+{
+    fill-opacity: 70%;
+}
+
 /* Tooltip */
 #tooltip {
     position: absolute;
