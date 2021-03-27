@@ -15,6 +15,7 @@ class Histogram {
       tooltipPadding: _config.tooltipPadding || 15
     }
     this.data = _data;
+    this.typeFiltered = null;
     this.factor = "Customer_Age";
     this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
     this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
@@ -65,14 +66,16 @@ class Histogram {
     // Prepare data: count number of leaders in each category
     vis.data.sort((a, b) => a[factor] - b[factor]);
     // i.e. [{ key: 'male', count: 10 }, {key: 'female', 20}
-    const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d[factor]);
-    vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
- 
-    const aggregatedDataMap1 = d3.rollups(vis.unchurned, v => v.length, d => d[factor]);
-    vis.aggregatedData1 = Array.from(aggregatedDataMap1, ([key, count]) => ({ key, count }));
- 
-    const aggregatedDataMap2 = d3.rollups(vis.churned, v => v.length, d => d[factor]);
-    vis.aggregatedData2 = Array.from(aggregatedDataMap2, ([key, count]) => ({ key, count }));
+    // const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d[factor]);
+    // vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
+    if(this.typeFiltered === null || this.typeFiltered === "unchurned"){
+      const aggregatedDataMap = d3.rollups(vis.unchurned, v => v.length, d => d[factor]);
+      vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
+   
+      } else if(this.typeFiltered === "churned"){
+        const aggregatedDataMap = d3.rollups(vis.churned, v => v.length, d => d[factor]);
+        vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
+          }
 
     // Specificy accessor functions
     vis.xValue = d => d.key;
@@ -81,18 +84,19 @@ class Histogram {
     vis.xScale.domain([d3.min(vis.data, d => d[factor]),d3.max(vis.data, d=>d[factor] )]);
     //TODO:
     // vis.yScale.domain([0, d3.max(bins, function(d) { return d.length; })]);
-    vis.yScale.domain([0, d3.max(vis.aggregatedData1, vis.yValue)]);
+    vis.yScale.domain([0, d3.max(vis.aggregatedData, vis.yValue)]);
 
     var histogram = d3.histogram()
     .value(d=>d[factor])   // I need to give the vector of value
     .domain(vis.xScale.domain())  // then the domain of the graphic
     .thresholds(vis.xScale.ticks(24)); // then the numbers of bins
-
+    if(this.typeFiltered === null || this.typeFiltered === "unchurned"){
     vis.bins = histogram(vis.unchurned);
+    } else if(this.typeFiltered === "churned"){
+    vis.bins = histogram(vis.churned);
+    }
 
-    console.log(vis.bins); //TODO: print nothing??
-
-
+    // console.log(vis.bins); 
 
     vis.renderVis();
   }
@@ -100,7 +104,8 @@ class Histogram {
   renderVis() {
     // Bind data to visual elements, update axes
     let vis = this;
-
+    // console.log(this.typeFiltered);
+    if(this.typeFiltered === null || this.typeFiltered === "unchurned"){
     //histogram of unchurned
     vis.chartArea.selectAll("rect")
         .data(vis.bins)
@@ -120,26 +125,29 @@ class Histogram {
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text('unchurned');
-
+      }
     //histogram of churned
-    // const rect2 = vis.chartArea.selectAll("rect")
-    // .data(vis.aggregatedData2, vis.xValue)		
-    // .join("rect")	
-    // .attr("fill","red")		
-    // .attr('x', d => vis.xScale(vis.xValue(d)))
-    //     .attr('width', vis.xScale.bandwidth())
-    //     .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
-    //     .attr('y', d => vis.yScale(vis.yValue(d)))
-    //     .style('opacity',.4);
+    else if(this.typeFiltered ===  "churned"){
+      vis.chartArea.selectAll("rect")
+      .data(vis.bins)
+      .join("rect")
+      .attr("x", 2)
+      .attr("transform", d => {
+        return `translate(${vis.xScale(d.x0)}, ${vis.yScale(d.length)})`
+      })
+      .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
+      .attr("height", d => vis.height - vis.yScale(d.length))
+      .style("fill", "red")
 
-    vis.chartArea.append('text')
-    .attr('class', 'axis-title')
-    .attr('y', -15)
-    .attr('x', vis.width/2)
-    .attr('dy', '.71em')
-    .style('text-anchor', 'end')
-    .text('churned');
-
+      vis.chartArea.append('text')
+      .attr('class', 'axis-title')
+      .attr('y', -15)
+      .attr('x', vis.width/2)
+      .attr('dy', '.71em')
+      .style('text-anchor', 'end')
+      .text('churned');
+    }
+    
     vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
     vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "red").style('opacity',.4)
     vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
