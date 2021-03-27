@@ -45,13 +45,15 @@ class Histogram {
     vis.yAxisG = vis.chartArea.append('g')
         .attr('class', 'axis y-axis');
 
-    vis.xScale = d3.scaleBand()
+    // vis.xScale = d3.scaleBand()
+    //     .range([0, vis.width]);
+    vis.xScale = d3.scaleLinear()
         .range([0, vis.width]);
     vis.xAxis = d3.axisBottom(vis.xScale);
     vis.xAxisG = vis.chartArea.append('g')
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
-
+        
     vis.updateVis();
   }
 
@@ -76,10 +78,19 @@ class Histogram {
     vis.xValue = d => d.key;
     vis.yValue = d => d.count;
 
-    vis.xScale.domain(vis.aggregatedData.map(vis.xValue));
+    vis.xScale.domain(d3.max(vis.data, function(d) { return +d[factor] }));
+    //TODO: 
+    // vis.yScale.domain([0, d3.max(bins, function(d) { return d.length; })]);
     vis.yScale.domain([0, d3.max(vis.aggregatedData1, vis.yValue)]);
 
-    // console.log(vis.aggregatedData1);
+    var histogram = d3.histogram()
+    .value(function(d) { return d[factor]; })   // I need to give the vector of value
+    .domain(vis.xScale.domain())  // then the domain of the graphic
+    .thresholds(vis.xScale.ticks(70)); // then the numbers of bins
+
+    var bins = histogram(vis.data);
+
+    console.log(bins); //TODO: print nothing??
 
     vis.renderVis();
   }
@@ -94,7 +105,9 @@ class Histogram {
     .join("rect")	
     .attr("fill","steelblue")		
     .attr('x', d => vis.xScale(vis.xValue(d)))
-        .attr('width', vis.xScale.bandwidth())
+        // .attr('width', vis.xScale.bandwidth())
+        //TODO: what's width? d.x1 d.x0??
+        .attr('width', 12)
         .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
         .attr('y', d => vis.yScale(vis.yValue(d)))
         .style('opacity',.4);
@@ -108,15 +121,15 @@ class Histogram {
         .text('unchurned');
 
     //histogram of churned
-    const rect2 = vis.chartArea.selectAll("rect")
-    .data(vis.aggregatedData2, vis.xValue)		
-    .join("rect")	
-    .attr("fill","red")		
-    .attr('x', d => vis.xScale(vis.xValue(d)))
-        .attr('width', vis.xScale.bandwidth())
-        .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
-        .attr('y', d => vis.yScale(vis.yValue(d)))
-        .style('opacity',.4);
+    // const rect2 = vis.chartArea.selectAll("rect")
+    // .data(vis.aggregatedData2, vis.xValue)		
+    // .join("rect")	
+    // .attr("fill","red")		
+    // .attr('x', d => vis.xScale(vis.xValue(d)))
+    //     .attr('width', vis.xScale.bandwidth())
+    //     .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
+    //     .attr('y', d => vis.yScale(vis.yValue(d)))
+    //     .style('opacity',.4);
 
     vis.chartArea.append('text')
     .attr('class', 'axis-title')

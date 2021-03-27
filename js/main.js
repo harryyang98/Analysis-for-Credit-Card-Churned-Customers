@@ -18,9 +18,8 @@ d3.csv('data/BankChurners.csv').then(data => {
   // Convert columns to numerical values
   data.forEach(d => {
     Object.keys(d).forEach(attr => {
-      if (attr == 'Customer_Age') {
-        d[attr] = (d[attr] == 'NA') ? null : +d[attr];
-      } else if (attr != 'Attrition_Flag' && attr != 'Dependent_count') {
+      if (attr != 'Attrition_Flag' && attr != 'Dependent_count' && attr != "Gender" 
+      && attr != "Education_Level" && attr != "Marital_Status" && attr != "Income_Category") {
         d[attr] = +d[attr];
       }
     });
