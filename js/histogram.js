@@ -78,19 +78,21 @@ class Histogram {
     vis.xValue = d => d.key;
     vis.yValue = d => d.count;
 
-    vis.xScale.domain(d3.max(vis.data, function(d) { return +d[factor] }));
-    //TODO: 
+    vis.xScale.domain([d3.min(vis.data, d => d[factor]),d3.max(vis.data, d=>d[factor] )]);
+    //TODO:
     // vis.yScale.domain([0, d3.max(bins, function(d) { return d.length; })]);
     vis.yScale.domain([0, d3.max(vis.aggregatedData1, vis.yValue)]);
 
     var histogram = d3.histogram()
-    .value(function(d) { return d[factor]; })   // I need to give the vector of value
+    .value(d=>d[factor])   // I need to give the vector of value
     .domain(vis.xScale.domain())  // then the domain of the graphic
-    .thresholds(vis.xScale.ticks(70)); // then the numbers of bins
+    .thresholds(vis.xScale.ticks(24)); // then the numbers of bins
 
-    var bins = histogram(vis.data);
+    vis.bins = histogram(vis.unchurned);
 
-    console.log(bins); //TODO: print nothing??
+    console.log(vis.bins); //TODO: print nothing??
+
+
 
     vis.renderVis();
   }
@@ -100,18 +102,17 @@ class Histogram {
     let vis = this;
 
     //histogram of unchurned
-    const rect1 = vis.chartArea.selectAll("rect")
-    .data(vis.aggregatedData1, vis.xValue)		
-    .join("rect")	
-    .attr("fill","steelblue")		
-    .attr('x', d => vis.xScale(vis.xValue(d)))
-        // .attr('width', vis.xScale.bandwidth())
-        //TODO: what's width? d.x1 d.x0??
-        .attr('width', 12)
-        .attr('height', d => vis.height - vis.yScale(vis.yValue(d)))
-        .attr('y', d => vis.yScale(vis.yValue(d)))
-        .style('opacity',.4);
-    
+    vis.chartArea.selectAll("rect")
+        .data(vis.bins)
+        .join("rect")
+        .attr("x", 2)
+        .attr("transform", d => {
+          return `translate(${vis.xScale(d.x0)}, ${vis.yScale(d.length)})`
+        })
+        .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
+        .attr("height", d => vis.height - vis.yScale(d.length))
+        .style("fill", "#69b3a2")
+
         vis.chartArea.append('text')
         .attr('class', 'axis-title')
         .attr('y', -15)
