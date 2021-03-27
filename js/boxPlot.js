@@ -7,7 +7,7 @@ class BoxPlot {
 
   constructor(_config, _data, _dispatcher) {
     this.config = {
-      parentElement: _config.parentElement,''
+      parentElement: _config.parentElement,
       containerWidth: 350,
       containerHeight: 350,
       barWidth: 10,
