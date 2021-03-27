@@ -7,10 +7,10 @@ class BoxPlot {
 
   constructor(_config, _data, _dispatcher) {
     this.config = {
-      parentElement: _config.parentElement,
+      parentElement: _config.parentElement,''
       containerWidth: 350,
       containerHeight: 350,
-      barWidth: 65,
+      barWidth: 10,
       margin: { top: 20, right: 10, bottom: 20, left: 15 },
 
       tooltipPadding: _config.tooltipPadding || 25
@@ -105,7 +105,7 @@ class BoxPlot {
     record["counts"] = groupCounts["churned"];
     record["quartile"] = boxQuartiles(groupCounts["churned"]);
     record["whiskers"] = findWhiskerRange();
-    record["color"] = "steelblue";
+    record["color"] = "cornflowerblue";
 
     function boxQuartiles(d) {
       return [
@@ -131,7 +131,7 @@ class BoxPlot {
     record["counts"] = groupCounts["unchurned"];
     record["quartile"] = boxQuartiles(groupCounts["unchurned"]);
     record["whiskers"] = findWhiskerRange();
-    record["color"] = "steelblue";
+    record["color"] = "cornflowerblue";
     vis.boxPlotData.push(record);
 
 
@@ -170,9 +170,8 @@ class BoxPlot {
 
 
     vis.xNum = d3.scaleLinear()
-        .range([0, vis.xScale.bandwidth()])
+        .range([0, 2.5*vis.xScale.bandwidth()])
         .domain([-maxNum, maxNum])
-    console.log(vis.xScale.bandwidth())
 
 
     vis.renderVis();
@@ -186,8 +185,6 @@ class BoxPlot {
         .data([vis.churnedBin])
         .join("path")
         .attr("class", "churnedViolin")
-        .style("stroke", "none")
-        .style("fill","#69b3a2")
         .attr("d", d3.area()
             .x0(d => {
               return vis.xNum(-d.length)
@@ -195,14 +192,12 @@ class BoxPlot {
             .x1(d => vis.xNum(d.length))
             .y(d => vis.yScale(d.x0))
             .curve(d3.curveCatmullRom))
-        .attr("transform", `translate(${vis.xScale("churned")}, 0)`)
+        .attr("transform", `translate(${vis.xScale("churned")-0.75*vis.xScale.bandwidth()}, 0)`)
 
     vis.chartArea.selectAll(".unchurnedViolin")
         .data([vis.unchurnedBin])
         .join("path")
         .attr("class", "unchurnedViolin")
-        .style("stroke", "none")
-        .style("fill","#69b3a2")
         .attr("d", d3.area()
             .x0(d => {
               return vis.xNum(-d.length)
@@ -210,7 +205,7 @@ class BoxPlot {
             .x1(d => vis.xNum(d.length))
             .y(d => vis.yScale(d.x0))
             .curve(d3.curveCatmullRom))
-        .attr("transform", `translate(${vis.xScale("unchurned")}, 0)`)
+        .attr("transform", `translate(${vis.xScale("unchurned")-0.75*vis.xScale.bandwidth()}, 0)`)
 
     // Draw the box plot vertical lines
     const verticalLines = vis.chartArea.selectAll(".verticalLines")
@@ -221,6 +216,7 @@ class BoxPlot {
         .attr('y1', d => vis.yScale(d.whiskers[0]))
         .attr('x2', d => vis.xScale(d.key) + vis.config.barWidth/2)
         .attr('y2', d => vis.yScale(d.whiskers[1]))
+        .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
         .attr('stroke', "#001")
         .attr('stroke-width', 1)
         .attr('fill', 'none');
@@ -234,6 +230,7 @@ class BoxPlot {
         .attr("height", d => vis.yScale(d.quartile[0]) - vis.yScale(d.quartile[2]))
         .attr("x", d => vis.xScale(d.key))
         .attr("y", d => vis.yScale(d.quartile[2]))
+        .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
         .attr("fill", d => d.color)
         .attr("stroke", "#002")
         .attr("stroke-width", 1);
@@ -246,16 +243,32 @@ class BoxPlot {
         .attr("y1", d => vis.yScale(d.quartile[1]))
         .attr("x2", d => vis.xScale(d.key) + vis.config.barWidth)
         .attr("y2", d => vis.yScale(d.quartile[1]))
-        .attr("stroke-width", 2)
-        .attr("fill", "none");
+        .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
 
 
+    vis.chartArea.selectAll(".max")
+        .data(vis.boxPlotData)
+        .join("line")
+        .attr("class", "max")
+        .attr("x1", d => vis.xScale(d.key))
+        .attr("y1", d => vis.yScale(d.whiskers[1]))
+        .attr("x2", d => vis.xScale(d.key) + vis.config.barWidth)
+        .attr("y2", d => vis.yScale(d.whiskers[1]))
+        .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
 
 
-
+    vis.chartArea.selectAll(".min")
+        .data(vis.boxPlotData)
+        .join("line")
+        .attr("class", "min")
+        .attr("x1", d => vis.xScale(d.key))
+        .attr("y1", d => vis.yScale(d.whiskers[0]))
+        .attr("x2", d => vis.xScale(d.key) + vis.config.barWidth)
+        .attr("y2", d => vis.yScale(d.whiskers[0]))
+        .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
 
     vis.xAxisG.call(vis.xAxis)
-        // .call(g => g.select('.domain').remove());
+        .call(g => g.select('.domain').remove());
 
     vis.yAxisG.call(vis.yAxis)
         .call(g => g.select('.domain').remove());
