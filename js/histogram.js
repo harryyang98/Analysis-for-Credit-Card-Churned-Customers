@@ -105,6 +105,16 @@ class Histogram {
     console.log(vis.bins); 
     vis.yScale.domain([0, d3.max(vis.bins, function(d) { return d.length; })]);
 
+    vis.displayText = () => {
+      if (this.typeFiltered === null) {
+        return ['total']}
+      else if (this.typeFiltered[0] === "unchurned"){
+        return ['unchurned']}
+      else if (this.typeFiltered[0] ===  "churned"){
+        return ['churned']}
+    }
+
+
     vis.renderVis();
   }
 
@@ -148,20 +158,15 @@ class Histogram {
       //       return 'churned'}
       //     });
 
-        vis.chartArea.append('text')
-        .attr('class', 'axis-title')
+        vis.chartArea.selectAll(".displayText")
+            .data(vis.displayText())
+            .join("text")
+        .attr('class', 'displayText')
         .attr('y', -15)
         .attr('x', vis.width/2)
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
-        .text(d => {
-          if (this.typeFiltered === null) {
-            return 'total'}
-          else if (this.typeFiltered[0] === "unchurned"){
-            return 'unchurned'}
-          else if (this.typeFiltered[0] ===  "churned"){
-            return 'churned'}
-          });
+        .text(d => d);
 
     vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "#69b3a2").style('opacity',.4)
     vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
