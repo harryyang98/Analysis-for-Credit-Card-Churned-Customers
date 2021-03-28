@@ -84,9 +84,9 @@ class Histogram {
 
     if(this.typeFiltered === null){
       vis.xScale.domain([d3.min(vis.data, d => d[factor]),d3.max(vis.data, d=>d[factor] )]);
-    } else if (this.typeFiltered === "unchurned"){
+    } else if (this.typeFiltered[0] === "unchurned"){
       vis.xScale.domain([d3.min(vis.unchurned, d => d[factor]),d3.max(vis.unchurned, d=>d[factor] )]);
-    } else if(this.typeFiltered === "churned"){
+    } else if(this.typeFiltered[0] === "churned"){
       vis.xScale.domain([d3.min(vis.churned, d => d[factor]),d3.max(vis.churned, d=>d[factor] )]);
     }
     // vis.yScale.domain([0, d3.max(vis.aggregatedData, vis.yValue)]);
@@ -97,9 +97,9 @@ class Histogram {
     .thresholds(vis.xScale.ticks(24)); // then the numbers of bins
     if(this.typeFiltered === null){
       vis.bins = histogram(vis.data);
-    }else if (this.typeFiltered === "unchurned"){
+    }else if (this.typeFiltered[0] === "unchurned"){
     vis.bins = histogram(vis.unchurned);
-    } else if(this.typeFiltered === "churned"){
+    } else if(this.typeFiltered[0] === "churned"){
     vis.bins = histogram(vis.churned);
     }
     console.log(vis.bins); 
@@ -133,9 +133,9 @@ class Histogram {
         .text(d => {
           if (this.typeFiltered === null) {
             return 'total'}
-          else if (this.typeFiltered === "unchurned"){
+          else if (this.typeFiltered[0] === "unchurned"){
             return 'unchurned'}
-          else if (this.typeFiltered ===  "churned"){
+          else if (this.typeFiltered[0] ===  "churned"){
             return 'churned'
           }});
     
