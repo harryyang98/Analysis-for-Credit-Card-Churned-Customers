@@ -20,6 +20,12 @@ let filteredData;
 
 //   });
 
+<<<<<<< Updated upstream
+=======
+  const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data);
+  const histogram = new Histogram({parentElement: '#histogram'}, data);
+  const scatterPlot = new ScatterPlot({parentElement: '#scatterPlot'}, data);
+>>>>>>> Stashed changes
 
 // });
 
