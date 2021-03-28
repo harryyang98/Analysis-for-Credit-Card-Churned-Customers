@@ -122,7 +122,31 @@ class Histogram {
         })
         .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
         .attr("height", d => vis.height - vis.yScale(d.length))
-        .style("fill", "#69b3a2")
+        .style("fill", d => {
+          if (this.typeFiltered === null) {
+            return "#69b3a2"}
+          else if (this.typeFiltered[0] === "unchurned"){
+            return "steelblue"}
+          else if (this.typeFiltered[0] ===  "churned"){
+            return "red"}
+          })
+
+      // const title = vis.chartArea.selectAll('title')
+      // .data(vis.data)
+      // .join('text')
+      // .attr('class', 'axis-title')
+      // .attr('y', -15)
+      //   .attr('x', vis.width/2)
+      //   .attr('dy', '.71em')
+      //   .style('text-anchor', 'end')
+      //   .text(d => {
+      //     if (this.typeFiltered === null) {
+      //       return 'total'}
+      //     else if (this.typeFiltered[0] === "unchurned"){
+      //       return 'unchurned'}
+      //     else if (this.typeFiltered[0] ===  "churned"){
+      //       return 'churned'}
+      //     });
 
         vis.chartArea.append('text')
         .attr('class', 'axis-title')
@@ -136,13 +160,15 @@ class Histogram {
           else if (this.typeFiltered[0] === "unchurned"){
             return 'unchurned'}
           else if (this.typeFiltered[0] ===  "churned"){
-            return 'churned'
-          }});
-    
-    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
-    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "red").style('opacity',.4)
-    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
-    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 60).text("churned").style("font-size", "15px").attr("alignment-baseline","middle")
+            return 'churned'}
+          });
+
+    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "#69b3a2").style('opacity',.4)
+    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
+    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",90).attr("r", 6).style("fill", "red").style('opacity',.4)
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("total").style("font-size", "15px").attr("alignment-baseline","middle")
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 60).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 90).text("churned").style("font-size", "15px").attr("alignment-baseline","middle")
 
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());
