@@ -44,14 +44,14 @@
     fill: orangered;
 }
 
+.legend-text {
+    font-size: 10px;
+    fill: orangered;
+}
+
 /* inactive state */
 .inactive {
     fill: grey;
-}
-
-.legend-text {
-    font-size: 10px;
-    fill: black;
 }
 
 

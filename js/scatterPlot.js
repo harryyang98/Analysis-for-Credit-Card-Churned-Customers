@@ -20,7 +20,8 @@ class ScatterPlot {
     this.data = _data;
     //this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
     //this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
-    this.filteredData = _data.filter(d => d['Customer_Age']>=20 && d['Customer_Age']<=30);
+    this.filteredData = _data.filter(d => d['Customer_Age']>=21 && d['Customer_Age']<=30);
+    this.selectedArray = "temp-20";
     this.initVis();
   }
   
@@ -95,29 +96,26 @@ class ScatterPlot {
         .attr('cy', d => vis.yScale(vis.yValue(d)))
         .attr('cx', d => vis.xScale(vis.xValue(d)));
 
-    // //when mouse is over the point, show tooltip with detailed information.
-    // circles
-    //     .on('mouseover', (event,d) => {
-    //       if(gender.includes(d.gender) || gender.length===0){
-    //         d3.select('#tooltip')
-    //             .style('display', 'block')
-    //             .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
-    //             .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-    //             .html(
-    //                 `
-    //           <div class="tooltip-title">${d.leader}</div>
-    //           <div><i>${d.country}, ${d.start_year}-${d.end_year}</i></div>
-    //           <ul>
-    //             <li>Age at inauguration: ${d.start_age}</li>
-    //             <li>Time in office: ${d.duration} years</li>
-    //             <li>GDP/capita: ${d.pcgdp}</li>
-    //           </ul>
-    //         `);
-    //       }
-    //     })
-    //     .on('mouseleave', () => {
-    //       d3.select('#tooltip').style('display', 'none');
-    //     });
+    //when mouse is over the point, show tooltip with detailed information.
+    circles
+        .on('mouseover', (event,d) => {
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(
+                    `
+              <div class="tooltip-title"> ID: ${d['CLIENTNUM']}</div>
+              <ul>
+                <li>Attrition_Flag: ${d['Attrition_Flag']}</li>
+                <li>Age: ${d['Customer_Age']}</li>
+                <li>Dependent_count: ${d['Dependent_count']}</li>
+              </ul>
+            `);
+        })
+        .on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+        });
 
   }
 
@@ -127,28 +125,28 @@ class ScatterPlot {
     vis.legend = [];
     // push all 5 names and corresponding category to the legend array
     vis.legend.push({
-      title: "20-30",
-      category: "20-30"});
+      title: "21-30",
+      category: "temp-20"});
 
     vis.legend.push({
       title: "31-40",
-      category: "31-40"});
+      category: "temp-30"});
 
     vis.legend.push({
       title: "41-50",
-      category: "41-50"});
+      category: "temp-40"});
 
     vis.legend.push({
       title: "51-60",
-      category: "51-60"});
+      category: "temp-50"});
 
     vis.legend.push({
       title: "61-70",
-      category: "61-70"});
+      category: "temp-60"});
 
     vis.legend.push({
       title: "71-80",
-      category: "71-80"});
+      category: "temp-70"});
 
 
     //initialize the drawing area for legend
@@ -165,16 +163,14 @@ class ScatterPlot {
         .attr('r', vis.config.legendRadius)
         .attr('cy', vis.legendPosY)
         .attr('cx', vis.legendPosX)
-        .attr('class', 'legend-btn')
         .attr('class', d=>{
-            if (d.title ==="20-30"){
-                return 'legend-btn active'
+            if (d.title ==="21-30"){
+                return 'legend-btn'
             }else{
                 return 'legend-btn inactive'
             }
         })
-        .attr('category', d => `${d.category}`)
-        .style("stroke", "grey");    //outline with color grey
+        .attr('category', d => `${d.category}`);
 
 
     const legLabel = vis.legendArea.selectAll('.legend-text')
@@ -182,19 +178,44 @@ class ScatterPlot {
     //enter, legend dont need update
     const legLabelEnter = legLabel.enter()
         .append('text')
-        .attr('class', 'legend-text')
+        .attr('class', d=>{
+            if (d.title ==="20-30"){
+                return 'legend-text'
+            }else{
+                return 'legend-text inactive'
+            }
+        })
         .attr('y', vis.legendPosY)
         .attr('x', vis.legendPosX)
         .attr('dx', "1em")
         .style('alignment-baseline', 'middle')
+        .attr('category', d => `${d.category}`)
         .text(d => d.title);
 
-    //for each legend, click on it will change its state between active and inactive
-    vis.legend.forEach(legend => {
-
-    })
-
-
+      //for each legend, click on it will change its state between active and inactive
+      vis.legend.forEach(legend => {
+          //click changes its state
+          //change the state to inactive if the legend was not inactive
+          //else change the state to active
+          vis.legendArea.selectAll(`[category=${legend.category}]`)
+              .on('click', ()=> {
+                  if (this.selectedArray !== legend.category){
+                      //check if  legend state is inactive
+                      const isNotActive = d3.select(`[category=${legend.category}]`).classed('inactive');
+                      // add class inactive if its active, else delete class inactive
+                      d3.selectAll(`[category=${legend.category}]`)
+                          .classed('inactive', !isNotActive);
+                      const isNotActive2 = d3.select(`[category=${this.selectedArray}]`).classed('inactive');
+                      d3.selectAll(`[category=${this.selectedArray}]`)
+                          .classed('inactive', !isNotActive2);
+                      this.selectedArray= legend.category;
+                      const res = legend.title.split("-");
+                      console.log(res);
+                      this.filteredData = this.data.filter(d => d['Customer_Age']>=res[0] && d['Customer_Age']<=res[1]);
+                      this.updateVis();
+                  }
+              })
+      });
   }
 
 }
