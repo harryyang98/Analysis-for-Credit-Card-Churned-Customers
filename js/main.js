@@ -12,22 +12,22 @@
 
 
 let filteredData;
+const dispatcher = d3.dispatch('filterCustomerType');
 
 d3.csv('data/BankChurners.csv').then(data => {
 
   // Convert columns to numerical values
   data.forEach(d => {
     Object.keys(d).forEach(attr => {
-      if (attr == 'Customer_Age') {
-        d[attr] = (d[attr] == 'NA') ? null : +d[attr];
-      } else if (attr != 'Attrition_Flag' && attr != 'Dependent_count') {
+      if (attr != 'Attrition_Flag' && attr != 'Dependent_count' && attr != "Gender" 
+      && attr != "Education_Level" && attr != "Marital_Status" && attr != "Income_Category") {
         d[attr] = +d[attr];
       }
     });
   });
 
 
-  const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data);
+  const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data, dispatcher);
   const histogram = new Histogram({parentElement: '#histogram'}, data);
   const scatterPlot = new ScatterPlot({parentElement: '#scatterPlot'}, data);
 
@@ -37,10 +37,21 @@ d3.csv('data/BankChurners.csv').then(data => {
     boxPlot.factor = option;
     boxPlot.boxPlotData = [];
     boxPlot.updateVis();
-
+    boxPlot.selectedType = [];
     histogram.factor = option;
+    histogram.typeFiltered = null;
     histogram.updateVis();
+  })
 
+  dispatcher.on('filterCustomerType', selectedType => {
+    console.log(selectedType);
+    console.log(selectedType.length);
+    if (selectedType.length === 0) {
+      histogram.typeFiltered = null;
+    } else {
+      histogram.typeFiltered = selectedType;
+    }
+    histogram.updateVis();
   })
 
 });
