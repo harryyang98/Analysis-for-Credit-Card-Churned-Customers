@@ -29,6 +29,7 @@ d3.csv('data/BankChurners.csv').then(data => {
 
   const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data, dispatcher);
   const histogram = new Histogram({parentElement: '#histogram'}, data);
+  const scatterPlot = new ScatterPlot({parentElement: '#scatterPlot'}, data);
 
   d3.select('#quantFactor-selector').on('change', () => {
     const option = d3.select('#quantFactor-selector').property('value');
