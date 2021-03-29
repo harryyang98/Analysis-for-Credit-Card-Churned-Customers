@@ -10,6 +10,43 @@
     font-weight: bold;
 }
 
+line.avg
+{
+    stroke: darkblue;
+    stroke-width: 2;
+}
+
+line.max
+{
+    stroke: darkblue;
+    stroke-width: 2;
+}
+
+line.min
+{
+    stroke: darkblue;
+    stroke-width: 2;
+}
+
+
+
+path
+{
+    fill-opacity: 70%;
+}
+
+path.churnedViolin
+{
+    fill: orange;
+    stroke: none;
+}
+
+path.unchurnedViolin
+{
+    fill: orange;
+    stroke: none;
+}
+
 /* Tooltip */
 #tooltip {
     position: absolute;
