@@ -210,7 +210,6 @@ class ScatterPlot {
                           .classed('inactive', !isNotActive2);
                       this.selectedArray= legend.category;
                       const res = legend.title.split("-");
-                      console.log(res);
                       this.filteredData = this.data.filter(d => d['Customer_Age']>=res[0] && d['Customer_Age']<=res[1]);
                       this.updateVis();
                   }
