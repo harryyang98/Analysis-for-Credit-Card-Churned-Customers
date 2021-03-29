@@ -19,7 +19,7 @@ d3.csv('data/BankChurners.csv').then(data => {
   data.forEach(d => {
     Object.keys(d).forEach(attr => {
       if (attr != 'Attrition_Flag' && attr != 'Dependent_count' && attr != "Gender"
-          && attr != "Education_Level" && attr != "Marital_Status" && attr != "Income_Category") {
+      && attr != "Education_Level" && attr != "Marital_Status" && attr != "Income_Category") {
         d[attr] = +d[attr];
       }
     });
@@ -60,4 +60,3 @@ d3.csv('data/BankChurners.csv').then(data => {
   })
 
 });
-
