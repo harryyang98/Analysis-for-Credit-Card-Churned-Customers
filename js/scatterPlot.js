@@ -38,8 +38,6 @@ class ScatterPlot {
     vis.chartArea = vis.svg.append('g')
         .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
-    //vis.chart = vis.chartArea.append('g');
-
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
@@ -210,7 +208,6 @@ class ScatterPlot {
                           .classed('inactive', !isNotActive2);
                       this.selectedArray= legend.category;
                       const res = legend.title.split("-");
-                      console.log(res);
                       this.filteredData = this.data.filter(d => d['Customer_Age']>=res[0] && d['Customer_Age']<=res[1]);
                       this.updateVis();
                   }

@@ -16,6 +16,11 @@ https://www.d3-graph-gallery.com/graph/histogram_double.html
 ScatterPlot:
 https://stackoverflow.com/questions/13669239/remove-end-ticks-from-d3-js-axis
 
+PieChart:
+https://www.d3-graph-gallery.com/graph/pie_annotation.html
+https://observablehq.com/@d3/pie-chart
+https://www.d3-graph-gallery.com/graph/pie_changeData.html
+
 
 目前问题！
 box plot里 click selector后旧的横线仍然存在（没有被更新）

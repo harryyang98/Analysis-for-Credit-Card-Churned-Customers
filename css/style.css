@@ -1,3 +1,4 @@
+
 /* Todo: add styles */
 .axis line {
     fill: none;
@@ -28,8 +29,10 @@ line.min
     stroke-width: 2;
 }
 
-
-
+rect:hover {
+    stroke: rgba(7, 247, 27, 0.582);
+    stroke-width: 2;
+}
 path
 {
     fill-opacity: 70%;

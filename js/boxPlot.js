@@ -12,7 +12,6 @@ class BoxPlot {
       containerHeight: 350,
       barWidth: 10,
       margin: { top: 20, right: 10, bottom: 20, left: 15 },
-
       tooltipPadding: _config.tooltipPadding || 25
     }
     this.data = _data;
@@ -23,6 +22,7 @@ class BoxPlot {
     this.boxPlotData = [];
     this.lineConfig=null;
     this.horizontalLineConfigs=null;
+    this.selectedType = [];
     this.initVis();
   }
 
@@ -233,7 +233,20 @@ class BoxPlot {
         .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
         .attr("fill", d => d.color)
         .attr("stroke", "#002")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .on('click', function(event, d) {
+          // Check if current category is active and toggle class
+          const isActive = d3.select(this).classed('active');
+          d3.select(this).classed('active', !isActive);
+          // Get the names of all active/filtered categories
+          vis.selectedType = vis.chartArea.selectAll('rect.active').data().map(k => k.key)
+          if (vis.selectedType.length === 2) {
+            vis.chartArea.selectAll('rect.active').classed('active', false);
+            vis.selectedType = [];
+          }
+          // Trigger filter event and pass array with the selected category names
+          vis.dispatcher.call('filterCustomerType', event, vis.selectedType);
+        });
 
     vis.chartArea.selectAll(".avg")
         .data(vis.boxPlotData)

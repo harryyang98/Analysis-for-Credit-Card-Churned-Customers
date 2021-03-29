@@ -11,7 +11,7 @@
     <!-- todo: add visualizations -->
     <div class="container">
         <div>
-            Quantitative Factor: 
+            Quantitative Factor:
             <select id="quantFactor-selector">
                 <option value="Customer_Age">Age</option>
                 <option value="Dependent_count">Dependent Count</option>
@@ -27,9 +27,17 @@
                 <option value="Total_Trans_Ct">Total Transaction Count</option>
                 <option value="Avg_Utilization_Ratio">Average card utilization ratio </option>
             </select>
+            Categorical Factor:
+            <select id="cateFactor-selector">
+                <option value="Gender">Gender</option>
+                <option value="Education_Level">Education Level</option>
+                <option value="Marital_Status">Marital Status</option>
+                <option value="Income_Category">Income Category</option>
+            </select>
         </div>
         <div>
             <svg id="boxPlot"></svg>
+            <svg id="pieChart"></svg>
             <svg id="histogram"></svg>
             <svg id="scatterPlot"></svg>
         </div>
