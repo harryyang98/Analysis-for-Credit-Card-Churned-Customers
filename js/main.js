@@ -13,21 +13,36 @@
 
 let filteredData;
 
-// d3.csv('data/customerData.csv').then(data => {
+d3.csv('data/BankChurners.csv').then(data => {
 
-//   // Convert columns to numerical values
-//   data.forEach(d => {
+  // Convert columns to numerical values
+  data.forEach(d => {
+    Object.keys(d).forEach(attr => {
+      if (attr == 'Customer_Age') {
+        d[attr] = (d[attr] == 'NA') ? null : +d[attr];
+      } else if (attr != 'Attrition_Flag' && attr != 'Dependent_count') {
+        d[attr] = +d[attr];
+      }
+    });
+  });
 
-//   });
 
-<<<<<<< Updated upstream
-=======
   const boxPlot = new BoxPlot({parentElement: '#boxPlot'}, data);
   const histogram = new Histogram({parentElement: '#histogram'}, data);
   const scatterPlot = new ScatterPlot({parentElement: '#scatterPlot'}, data);
->>>>>>> Stashed changes
 
-// });
+  d3.select('#quantFactor-selector').on('change', () => {
+    const option = d3.select('#quantFactor-selector').property('value');
+    console.log(option);
+    boxPlot.factor = option;
+    boxPlot.boxPlotData = [];
+    boxPlot.updateVis();
 
+    histogram.factor = option;
+    histogram.updateVis();
+
+  })
+
+});
 
 

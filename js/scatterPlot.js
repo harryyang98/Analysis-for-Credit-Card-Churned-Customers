@@ -20,7 +20,7 @@ class ScatterPlot {
     this.data = _data;
     //this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
     //this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
-    this.filteredData = this.data;
+    this.filteredData = _data.filter(d => d['Customer_Age']>=20 && d['Customer_Age']<=30);
     this.initVis();
   }
   
@@ -166,6 +166,14 @@ class ScatterPlot {
         .attr('cy', vis.legendPosY)
         .attr('cx', vis.legendPosX)
         .attr('class', 'legend-btn')
+        .attr('class', d=>{
+            if (d.title ==="20-30"){
+                return 'legend-btn active'
+            }else{
+                return 'legend-btn inactive'
+            }
+        })
+        .attr('category', d => `${d.category}`)
         .style("stroke", "grey");    //outline with color grey
 
 
@@ -174,8 +182,7 @@ class ScatterPlot {
     //enter, legend dont need update
     const legLabelEnter = legLabel.enter()
         .append('text')
-        .attr('class', 'legend-text inactive')
-        .attr('category', d => `${d.category}`)
+        .attr('class', 'legend-text')
         .attr('y', vis.legendPosY)
         .attr('x', vis.legendPosX)
         .attr('dx', "1em")
@@ -184,33 +191,7 @@ class ScatterPlot {
 
     //for each legend, click on it will change its state between active and inactive
     vis.legend.forEach(legend => {
-      //click changes its state
-      //change the state to inactive if the legend was not inactive
-      //else change the state to active
-      vis.legendArea.select(`[category=${legend.category}]`)
-          .on('click', ()=> {
-            //check if  legend state is inactive
-            const isNotActive = d3.select(`[category=${legend.category}]`).classed('inactive');
-            // add class inactive if its active, else delete class inactive
-            d3.select(`[category=${legend.category}]`)
-                .classed('inactive', !isNotActive);
 
-            //for all the active legend, add its category to selectedCategories
-            d3.selectAll('.legend-text:not(.inactive)').each(d => {
-              vis.selectedCategories.push(d.category);
-            });
-
-            // if the selectedCategories is empty, it means no filter is applied. Then the filtered data is the same as the entire data
-            if (vis.selectedCategories.length === 0) {
-              vis.filtered = vis.data;
-            }else{
-              //filter the data based on the categories in selectedCategories
-              vis.filtered = vis.data.filter(d=>vis.selectedCategories.includes(d.category));
-
-            }
-
-            vis.updateVis();
-          })
     })
 
 
