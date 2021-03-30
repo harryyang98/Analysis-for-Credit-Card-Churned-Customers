@@ -90,7 +90,7 @@ class ScatterPlot {
         .data(vis.filteredData)
         .join('circle')
         .attr('class', 'point')
-        .attr('r', 5)
+        .attr('r', 2)
         .attr('cy', d => vis.yScale(vis.yValue(d)))
         .attr('cx', d => vis.xScale(vis.xValue(d)));
 
@@ -139,12 +139,8 @@ class ScatterPlot {
       category: "temp-50"});
 
     vis.legend.push({
-      title: "61-70",
+      title: "61-80",
       category: "temp-60"});
-
-    vis.legend.push({
-      title: "71-80",
-      category: "temp-70"});
 
 
     //initialize the drawing area for legend
