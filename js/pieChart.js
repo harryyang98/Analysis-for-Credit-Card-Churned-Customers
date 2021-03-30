@@ -61,13 +61,6 @@ class PieChart {
   updateVis() {
     // Prepare data and scales
     let vis= this;
-    // vis.pieChartData=d3.group(vis.data, d => d[vis.factor]);
-    // vis.pieChartData.forEach(d=>{
-    //   const temp ={};
-    //   temp["name"] = d[0][vis.factor];
-    //   temp["value"] = d.length;
-    //   vis.list.push(temp);
-    // });
     vis.list = []
     console.log(vis.churned)
     vis.pieChartData_churned = d3.group(vis.churned, d => d[vis.factor]);
@@ -75,6 +68,8 @@ class PieChart {
       const temp ={};
       temp["name"] = d[0][vis.factor];
       temp["value"] = d.length;
+      temp["type"] = "churned"
+
       vis.list.push(temp);
     });
     vis.color = d3.scaleOrdinal()
@@ -84,7 +79,7 @@ class PieChart {
     vis.pie = d3.pie()
         .value(d => d.value);
 
-    vis.data_ready_churned = vis.pie(this.list)
+    vis.data_ready_churned = vis.pie(vis.list)
 
     vis.list = []
     vis.pieChartData_unchurned = d3.group(vis.unchurned, d => d[vis.factor])
@@ -92,9 +87,10 @@ class PieChart {
       const temp ={};
       temp["name"] = d[0][vis.factor];
       temp["value"] = d.length;
+      temp["type"] = "unchurned"
       vis.list.push(temp);
     });
-    vis.data_ready_unchurned = vis.pie(this.list)
+    vis.data_ready_unchurned = vis.pie(vis.list)
     console.log(vis.data_ready_unchurned)
 
     vis.renderVis();
@@ -104,11 +100,12 @@ class PieChart {
     // Bind data to visual elements, update axes
     let vis = this;
 
+    // https://stackoverflow.com/questions/5963182/how-to-remove-spaces-from-a-string-using-javascript
     vis.chartArea.selectAll("g.unchurned")
-        .selectAll("path.unchurned")
+        .selectAll("path.unchurned.pie")
         .data(vis.data_ready_unchurned)
         .join("path")
-        .attr("class", d => `unchurned ${d.data.name}`)
+        .attr("class", 'unchurned pie')
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -116,13 +113,13 @@ class PieChart {
         .attr('fill', d => vis.color(d.data.name))
         .attr("stroke", "white")
         .style("stroke-width", "2px")
-        .style("opacity", 1);
+        .style("opacity", 1)
 
     vis.chartArea.selectAll("g.churned")
-        .selectAll("path.churned")
+        .selectAll("path.churned.pie")
         .data(vis.data_ready_churned)
         .join("path")
-        .attr("class", d => `churned ${d.data.name}`)
+        .attr("class", 'churned pie')
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -175,6 +172,52 @@ class PieChart {
         .attr("y", d => labelHeight * d.index * 1.8)
         .attr("transform", d => `translate(0, ${-0.5*vis.height + labelHeight})`)
         .attr("dy", "-0.2em")
+
+    const pie = vis.chartArea.selectAll(".pie")
+
+    pie.on('mouseover', function(event, d){
+      vis.chartArea.selectAll('.pie')
+          .classed("active", g => {
+            if (g.data.name === d.data.name) {
+              return true
+            }
+          })
+    })
+        .on('mouseleave', function(event, d){
+          vis.chartArea.selectAll('.pie')
+              .classed("active", g => {
+                if (g === d) {
+                  const isSelect = d3.select(this).classed('select')
+                  return isSelect
+                } else if (g.data.name === d.data.name) {
+                  return false
+                }
+              })
+        })
+        .on('click', function(event, d) {
+          const isSelect = d3.select(this).classed("select")
+          d3.select(this).classed('select', !isSelect);
+          if (!isSelect) {
+            d3.select(this).classed('active', true)
+          } else {
+            d3.select(this).classed('active', false)
+          }
+
+          if (!isSelect) {
+            d3.select(this).attr('d', d3.arc()
+                .innerRadius(0)
+                .outerRadius(1.1*vis.radius)
+            )
+          } else {
+            d3.select(this).attr('d', d3.arc()
+                .innerRadius(0)
+                .outerRadius(vis.radius)
+            )
+          }
+
+        })
+
+
   }
 
 }
