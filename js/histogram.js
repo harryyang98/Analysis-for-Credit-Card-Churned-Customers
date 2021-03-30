@@ -11,7 +11,7 @@ class Histogram {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 700,
       containerHeight: _config.containerHeight || 350,
-      margin: _config.margin || {top: 25, right: 35, bottom: 20, left: 35},
+      margin: _config.margin || {top: 25, right: 55, bottom: 20, left: 35},
       tooltipPadding: _config.tooltipPadding || 15
     }
     this.data = _data;
@@ -137,6 +137,19 @@ class Histogram {
         return ['churned']}
     }
 
+    vis.displayXlabel = () => {
+      if (this.factor === "Customer_Age") {
+        return ['Age']}
+      else if (this.factor ===  "Credit_Limit" || this.factor ===  "Total_Revolving_Bal" || this.factor ===  "Total_Trans_Amt" || this.factor ===  "Avg_Open_To_Buy"){
+        return ['$']}
+      else if (this.factor ===  "Total_Amt_Chng_Q4_Q1" || this.factor ===  "Avg_Utilization_Ratio"){
+        return ['Ratio']}
+      else return ['Count']
+    }
+
+    vis.displayYlabel = () => {
+        return ['Count']
+    }
 
     vis.renderVis();
   }
@@ -165,23 +178,6 @@ class Histogram {
         })
         .style("fill-opacity", "0.4")
 
-    // const title = vis.chartArea.selectAll('title')
-    // .data(vis.data)
-    // .join('text')
-    // .attr('class', 'axis-title')
-    // .attr('y', -15)
-    //   .attr('x', vis.width/2)
-    //   .attr('dy', '.71em')
-    //   .style('text-anchor', 'end')
-    //   .text(d => {
-    //     if (this.typeFiltered === null) {
-    //       return 'total'}
-    //     else if (this.typeFiltered[0] === "unchurned"){
-    //       return 'unchurned'}
-    //     else if (this.typeFiltered[0] ===  "churned"){
-    //       return 'churned'}
-    //     });
-
     vis.chartArea.selectAll(".displayText")
         .data(vis.displayText())
         .join("text")
@@ -189,9 +185,28 @@ class Histogram {
         .attr('y', -15)
         .attr('x', vis.width/2)
         .attr('dy', '.71em')
-        .style('text-anchor', 'end')
+        .style('text-anchor', 'middle')
         .text(d => d);
 
+    vis.chartArea.selectAll(".displayXlabel")
+        .data(vis.displayXlabel())
+        .join("text")
+        .attr('class', 'displayXlabel')
+        .attr('y', vis.height + 5)
+        .attr('x', vis.width + 35)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'middle')
+        .text(d => d);
+
+    vis.chartArea.selectAll(".displayYlabel")
+        .data(vis.displayYlabel())
+        .join("text")
+        .attr('class', 'displayYlabel')
+        .attr('y', -15)
+        .attr('x', 5)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .text(d => d);
 
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());

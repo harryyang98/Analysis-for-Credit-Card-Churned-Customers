@@ -11,7 +11,7 @@ class BoxPlot {
       containerWidth: 350,
       containerHeight: 350,
       barWidth: 10,
-      margin: { top: 20, right: 10, bottom: 20, left: 15 },
+      margin: { top: 25, right: 10, bottom: 20, left: 30 },
       tooltipPadding: _config.tooltipPadding || 25
     }
     this.data = _data;
@@ -174,6 +174,15 @@ class BoxPlot {
         .domain([-maxNum, maxNum])
 
 
+    vis.displayYlabel = () => {
+      if (this.factor === "Customer_Age") {
+        return ['Age']}
+      else if (this.factor ===  "Credit_Limit" || this.factor ===  "Total_Revolving_Bal" || this.factor ===  "Total_Trans_Amt" || this.factor ===  "Avg_Open_To_Buy"){
+        return ['$']}
+      else if (this.factor ===  "Total_Amt_Chng_Q4_Q1" || this.factor ===  "Avg_Utilization_Ratio"){
+        return ['Ratio']}
+      else return ['Count']
+    }
     vis.renderVis();
   }
 
@@ -280,6 +289,16 @@ class BoxPlot {
         .attr("y2", d => vis.yScale(d.whiskers[0]))
         .attr("transform", `translate(${0.5*vis.xScale.bandwidth()-0.5*vis.config.barWidth}, 0)`)
 
+    vis.chartArea.selectAll(".displayYlabel")
+        .data(vis.displayYlabel())
+        .join("text")
+        .attr('class', 'displayYlabel')
+        .attr('y', -20)
+        .attr('x', -15)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'middle')
+        .text(d => d);
+        
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());
 
