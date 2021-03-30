@@ -52,8 +52,12 @@ path.unchurnedViolin
 
 path.pie.active
 {
-    stroke: rgba(7, 247, 27, 0.582);
-    stroke-width: 2;
+    fill-opacity: 100%;
+}
+
+path.pie
+{
+    fill-opacity: 40%;
 }
 
 /* Tooltip */
