@@ -97,6 +97,27 @@ class PieChart {
     u
         .exit()
         .remove();
+
+    const labelHeight = 18
+    const legend = vis.chartArea.selectAll(".pieLegend")
+        .data(vis.data_ready)
+        .join("rect")
+        .attr("class", "pieLegend")
+        .attr("y", d => labelHeight * d.index * 1.8)
+        .attr("width", labelHeight)
+        .attr("height", labelHeight)
+        .attr("fill", d => vis.color(d.data.name))
+        .attr("transform", `translate(150, ${-0.5*vis.height})`)
+
+    const legendText = vis.chartArea.selectAll(".pieLegendText")
+        .data(vis.data_ready)
+        .join("text")
+        .attr("class", "pieLegendText")
+        .text(d => d.data.name)
+        .attr("x", labelHeight * 1.2)
+        .attr("y", d => labelHeight * d.index * 1.8)
+        .attr("transform", d => `translate(150, ${-0.5*vis.height + labelHeight})`)
+        .attr("dy", "-0.2em")
   }
 
 }
