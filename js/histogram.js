@@ -53,6 +53,29 @@ class Histogram {
     vis.xAxisG = vis.chartArea.append('g')
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
+    vis.chartArea.append("circle")
+        .attr("cx",vis.width-50)
+        .attr("cy",30)
+        .attr("r", 6)
+        .style("fill", "#69b3a2")
+        .style('opacity',.4)
+    vis.chartArea.append("circle")
+        .attr("cx",vis.width-50)
+        .attr("cy",60)
+        .attr("r", 6)
+        .style("fill", "steelblue")
+        .style('opacity',.4)
+    vis.chartArea
+        .append("circle")
+        .attr("cx",vis.width-50)
+        .attr("cy",90)
+        .attr("r", 6)
+        .style("fill", "red")
+        .style('opacity',.4)
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("total").style("font-size", "15px").attr("alignment-baseline","middle")
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 60).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
+    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 90).text("churned").style("font-size", "15px").attr("alignment-baseline","middle")
+
 
     vis.updateVis();
   }
@@ -84,9 +107,9 @@ class Histogram {
 
     if(this.typeFiltered === null){
       vis.xScale.domain([d3.min(vis.data, d => d[factor]),d3.max(vis.data, d=>d[factor] )]);
-    } else if (this.typeFiltered === "unchurned"){
+    } else if (this.typeFiltered[0] === "unchurned"){
       vis.xScale.domain([d3.min(vis.unchurned, d => d[factor]),d3.max(vis.unchurned, d=>d[factor] )]);
-    } else if(this.typeFiltered === "churned"){
+    } else if(this.typeFiltered[0] === "churned"){
       vis.xScale.domain([d3.min(vis.churned, d => d[factor]),d3.max(vis.churned, d=>d[factor] )]);
     }
     // vis.yScale.domain([0, d3.max(vis.aggregatedData, vis.yValue)]);
@@ -97,13 +120,23 @@ class Histogram {
         .thresholds(vis.xScale.ticks(24)); // then the numbers of bins
     if(this.typeFiltered === null){
       vis.bins = histogram(vis.data);
-    }else if (this.typeFiltered === "unchurned"){
+    }else if (this.typeFiltered[0] === "unchurned"){
       vis.bins = histogram(vis.unchurned);
-    } else if(this.typeFiltered === "churned"){
+    } else if(this.typeFiltered[0] === "churned"){
       vis.bins = histogram(vis.churned);
     }
     console.log(vis.bins);
     vis.yScale.domain([0, d3.max(vis.bins, function(d) { return d.length; })]);
+
+    vis.displayText = () => {
+      if (this.typeFiltered === null) {
+        return ['total']}
+      else if (this.typeFiltered[0] === "unchurned"){
+        return ['unchurned']}
+      else if (this.typeFiltered[0] ===  "churned"){
+        return ['churned']}
+    }
+
 
     vis.renderVis();
   }
@@ -122,27 +155,43 @@ class Histogram {
         })
         .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
         .attr("height", d => vis.height - vis.yScale(d.length))
-        .style("fill", "#69b3a2")
+        .style("fill", d => {
+          if (this.typeFiltered === null) {
+            return "#69b3a2"}
+          else if (this.typeFiltered[0] === "unchurned"){
+            return "steelblue"}
+          else if (this.typeFiltered[0] ===  "churned"){
+            return "red"}
+        })
+        .style("fill-opacity", "0.4")
 
-    vis.chartArea.append('text')
-        .attr('class', 'axis-title')
+    // const title = vis.chartArea.selectAll('title')
+    // .data(vis.data)
+    // .join('text')
+    // .attr('class', 'axis-title')
+    // .attr('y', -15)
+    //   .attr('x', vis.width/2)
+    //   .attr('dy', '.71em')
+    //   .style('text-anchor', 'end')
+    //   .text(d => {
+    //     if (this.typeFiltered === null) {
+    //       return 'total'}
+    //     else if (this.typeFiltered[0] === "unchurned"){
+    //       return 'unchurned'}
+    //     else if (this.typeFiltered[0] ===  "churned"){
+    //       return 'churned'}
+    //     });
+
+    vis.chartArea.selectAll(".displayText")
+        .data(vis.displayText())
+        .join("text")
+        .attr('class', 'displayText')
         .attr('y', -15)
         .attr('x', vis.width/2)
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
-        .text(d => {
-          if (this.typeFiltered === null) {
-            return 'total'}
-          else if (this.typeFiltered === "unchurned"){
-            return 'unchurned'}
-          else if (this.typeFiltered ===  "churned"){
-            return 'churned'
-          }});
+        .text(d => d);
 
-    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",30).attr("r", 6).style("fill", "steelblue").style('opacity',.4)
-    vis.chartArea.append("circle").attr("cx",vis.width-50).attr("cy",60).attr("r", 6).style("fill", "red").style('opacity',.4)
-    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 30).text("unchurned").style("font-size", "15px").attr("alignment-baseline","middle")
-    vis.chartArea.append("text").attr("x", vis.width-40).attr("y", 60).text("churned").style("font-size", "15px").attr("alignment-baseline","middle")
 
     vis.xAxisG.call(vis.xAxis)
         .call(g => g.select('.domain').remove());
@@ -152,4 +201,3 @@ class Histogram {
   }
 
 }
-
