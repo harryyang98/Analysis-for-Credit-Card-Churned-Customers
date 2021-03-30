@@ -105,10 +105,13 @@ class PieChart {
     let vis = this;
 
     vis.chartArea.selectAll("g.unchurned")
-        .selectAll("path.unchurned")
+        .selectAll("path.unchurned.pie")
         .data(vis.data_ready_unchurned)
         .join("path")
-        .attr("class", d => `unchurned ${d.data.name}`)
+        .attr("class", d => {
+          const str = d.data.name.replace(/\s+/g, '');
+          return `unchurned ${str} pie`
+        })
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -119,10 +122,13 @@ class PieChart {
         .style("opacity", 1);
 
     vis.chartArea.selectAll("g.churned")
-        .selectAll("path.churned")
+        .selectAll("path.churned.pie")
         .data(vis.data_ready_churned)
         .join("path")
-        .attr("class", d => `churned ${d.data.name}`)
+        .attr("class", d => {
+          const str = d.data.name.replace(/\s+/g, '');
+          return `churned ${str} pie`
+        })
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -175,6 +181,21 @@ class PieChart {
         .attr("y", d => labelHeight * d.index * 1.8)
         .attr("transform", d => `translate(0, ${-0.5*vis.height + labelHeight})`)
         .attr("dy", "-0.2em")
+
+    const pie = vis.chartArea.selectAll(".pie")
+
+    pie.on('mouseover', (event,d) => {
+      const str = d.data.name.replace(/\s+/g, '');
+      vis.chartArea.selectAll(`.${str}`)
+          .classed("active", true)
+    })
+        .on('mouseleave', (event, d) => {
+          const str = d.data.name.replace(/\s+/g, '');
+          d3.select('#tooltip').style('display', 'none');
+          vis.chartArea.selectAll(`.${str}`)
+              .classed("active", false)
+        });
+
   }
 
 }

@@ -49,6 +49,13 @@ path.unchurnedViolin
     fill-opacity: 70%;
 }
 
+
+path.pie.active
+{
+    stroke: rgba(7, 247, 27, 0.582);
+    stroke-width: 2;
+}
+
 /* Tooltip */
 #tooltip {
     position: absolute;
