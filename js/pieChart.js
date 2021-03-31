@@ -93,6 +93,11 @@ class PieChart {
     vis.data_ready_unchurned = vis.pie(vis.list)
     console.log(vis.data_ready_unchurned)
 
+    vis.total = {
+      churned: vis.churned.length,
+      unchurned: vis.unchurned.length
+    }
+
     vis.renderVis();
   }
 
@@ -176,14 +181,34 @@ class PieChart {
     const pie = vis.chartArea.selectAll(".pie")
 
     pie.on('mouseover', function(event, d){
+      let other = null
       vis.chartArea.selectAll('.pie')
           .classed("active", g => {
             if (g.data.name === d.data.name) {
+              if (g !== d) {
+                other = g
+              }
               return true
             }
-          })
+          });
+
+      console.log(other.data)
+      d3.select('#tooltip')
+          .style('display', 'block')
+          .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+          .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+          // TODO
+          .html(
+              `
+              <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
+              <ul>
+                <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
+                <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
+              </ul>
+            `);
     })
         .on('mouseleave', function(event, d){
+          d3.select('#tooltip').style('display', 'none');
           vis.chartArea.selectAll('.pie')
               .classed("active", g => {
                 if (g === d) {
