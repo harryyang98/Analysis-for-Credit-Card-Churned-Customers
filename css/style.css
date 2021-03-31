@@ -1,5 +1,22 @@
 
 /* Todo: add styles */
+text.displayXlabel
+{
+    font-size: 11px;
+}
+text.displayYlabel
+{
+    font-size: 11px;
+}
+.legend-title
+{
+    font-size: 11px;
+}
+.pieLegendText
+{
+    font-size: 11px;
+    dominant-baseline: central;
+}
 .axis line {
     fill: none;
     stroke: #ddd;

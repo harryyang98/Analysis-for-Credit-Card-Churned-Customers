@@ -11,7 +11,7 @@ class ScatterPlot {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 750,
       containerHeight: _config.containerWidth || 250,
-      margin: _config.margin || {top: 30, right: 25, bottom: 20, left: 50},
+      margin: _config.margin || {top: 40, right: 25, bottom: 20, left: 50},
       tooltipPadding: _config.tooltipPadding || 15,
       legendWidth: 170,
       legendHeight: 8,
@@ -53,6 +53,29 @@ class ScatterPlot {
     vis.xAxisG = vis.chartArea.append('g')
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
+
+    vis.chartArea.append("text")
+        .text("Total transaction count")
+        .attr("class", "displayYlabel")
+        .attr('transform', `translate(${vis.width}, ${vis.height})`)
+        .attr("dx", "-11em")
+        .attr("dy", "-.5em");
+    vis.yAxisTitle = vis.chartArea.append("g")
+        .attr("class", "x-axis-title")
+        .attr("transform", "translate(-15, -20)")
+    vis.yAxisTitle
+        .append("text")
+        .text("Total transaction")
+        .attr("class", "displayXlabel")
+        .attr("dy", "-.8em")
+        .attr("dx", "-3em");
+    vis.yAxisTitle
+        .append("text")
+        .text("amount")
+        .attr("class", "displayXlabel")
+        .attr("dx", "-1em");
+
+
     vis.updateVis();
     vis.renderLegend();
   }
@@ -147,6 +170,13 @@ class ScatterPlot {
     vis.legendArea = vis.svg.append('g')
         .attr('id', 'legend')
         .attr('transform', `translate(${vis.config.margin.left+30},${vis.config.margin.top})`);
+
+    vis.legendArea.selectAll(".legend-title")
+        .data(["Age"])
+        .join("text")
+        .attr("class", "legend-title")
+        .text(d=>d)
+        .attr("dy", "-1em")
 
     // for each legend, draw a circle
     const leg =vis.legendArea.selectAll('circle')
