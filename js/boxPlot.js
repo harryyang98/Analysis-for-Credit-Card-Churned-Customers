@@ -11,7 +11,7 @@ class BoxPlot {
       containerWidth: 350,
       containerHeight: 350,
       barWidth: 10,
-      margin: { top: 25, right: 10, bottom: 20, left: 30 },
+      margin: { top: 25, right: 10, bottom: 20, left: 65 },
       tooltipPadding: _config.tooltipPadding || 25
     }
     this.data = _data;
