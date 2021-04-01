@@ -89,17 +89,6 @@ class Histogram {
     vis.data.sort((a, b) => a[factor] - b[factor]);
     // i.e. [{ key: 'male', count: 10 }, {key: 'female', 20}
     console.log(this.typeFiltered);
-    // if(this.typeFiltered === null){
-    //   const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d[factor]);
-    //   vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
-    // } else if (this.typeFiltered === "unchurned"){
-    //   const aggregatedDataMap = d3.rollups(vis.unchurned, v => v.length, d => d[factor]);
-    //   vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
-
-    //   } else if(this.typeFiltered === "churned"){
-    //     const aggregatedDataMap = d3.rollups(vis.churned, v => v.length, d => d[factor]);
-    //     vis.aggregatedData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
-    //       }
 
     // Specificy accessor functions
     vis.xValue = d => d.key;
@@ -126,6 +115,8 @@ class Histogram {
       vis.bins = histogram(vis.churned);
     }
     console.log(vis.bins);
+    // console.log(vis.bins[0].length);
+
     vis.yScale.domain([0, d3.max(vis.bins, function(d) { return d.length; })]);
 
     vis.displayText = () => {
@@ -159,7 +150,7 @@ class Histogram {
     let vis = this;
     // console.log(this.typeFiltered);
     //histogram
-    vis.chartArea.selectAll("rect")
+    const rects = vis.chartArea.selectAll("rect")
         .data(vis.bins)
         .join("rect")
         .attr("x", 2)
@@ -176,7 +167,24 @@ class Histogram {
           else if (this.typeFiltered[0] ===  "churned"){
             return "red"}
         })
-        .style("fill-opacity", "0.4")
+        .style("fill-opacity", "0.4");
+
+    rects.on('mouseover', (event,d) => {
+      const tooltip = d3.select('#tooltip')
+          .style('display', 'block')
+          .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+          .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
+          tooltip.html(`
+          <ul>
+            <li>factor: ${vis.factor}</li>
+            <li>range: ${d.x0} ~ ${d.x1}</li>
+            <li>count: ${d.length}</li>
+          </ul>
+          `)
+        })
+        .on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+        })
 
     vis.chartArea.selectAll(".displayText")
         .data(vis.displayText())

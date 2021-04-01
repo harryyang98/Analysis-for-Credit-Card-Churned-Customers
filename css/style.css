@@ -1,8 +1,15 @@
 
 /* Todo: add styles */
+h1 {
+    text-align: center;
+    font-style: italic;
+    font-family: Bookman, URW Bookman L, serif;
+    font-size: 40px;
+    font-weight: 900;
+  }
 .description{
     background-image: linear-gradient(to top, rgb(237, 242, 243),rgb(217, 240, 247));
-    height: 60px;
+    height: 65px;
     }
 text.displayXlabel
 {
@@ -51,7 +58,7 @@ line.min
 }
 
 rect:hover {
-    stroke: rgba(7, 247, 27, 0.582);
+    stroke: rgb(7, 163, 184);
     stroke-width: 2;
 }
 
