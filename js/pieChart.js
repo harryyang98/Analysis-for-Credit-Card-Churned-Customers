@@ -18,6 +18,7 @@ class PieChart {
     this.dispatcher = _dispatcher;
     this.factor = "Gender";
     this.list=[];
+    this.typeFiltered = null;
     this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
     this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
     this.initVis();
@@ -62,7 +63,8 @@ class PieChart {
     // Prepare data and scales
     let vis= this;
     vis.list = []
-    console.log(vis.churned)
+    console.log(vis.churned);
+    console.log(vis.typeFiltered);
     vis.pieChartData_churned = d3.group(vis.churned, d => d[vis.factor]);
     vis.pieChartData_churned.forEach(d=>{
       const temp ={};
@@ -156,24 +158,14 @@ class PieChart {
 
 
     const labelHeight = 18
-    // const legend = vis.chartArea.selectAll("g.legend")
-    //     .selectAll(".pieLegend")
-    //     .data(vis.data_ready_unchurned)
-    //     .join("rect")
-    //     .attr("class", "pieLegend")
-    //     .attr("y", d => labelHeight * d.index * 1.8)
-    //     .attr("width", labelHeight)
-    //     .attr("height", labelHeight)
-    //     .attr("fill", d => vis.color(d.data.name))
-    //     .attr("transform", `translate(0, ${-0.5*vis.height})`)
     const legend = vis.chartArea.selectAll("g.legend")
         .selectAll(".pieLegend")
         .data(vis.data_ready_unchurned)
-        .join("circle")
+        .join("rect")
         .attr("class", "pieLegend")
-        .attr("cy", d => labelHeight * d.index)
-        .attr("cx", 0)
-        .attr("r", 5)
+        .attr("y", d => labelHeight * d.index * 1.8)
+        .attr("width", labelHeight)
+        .attr("height", labelHeight)
         .attr("fill", d => vis.color(d.data.name))
         .attr("transform", `translate(0, ${-0.5*vis.height})`)
 
@@ -183,12 +175,24 @@ class PieChart {
         .join("text")
         .attr("class", "pieLegendText")
         .text(d => d.data.name)
-        .attr("x", 10)
-        .attr("y", d => labelHeight * d.index)
-        .attr("transform", d => `translate(0, ${-0.5*vis.height})`)
+        .attr("x", labelHeight * 1.2)
+        .attr("y", d => labelHeight * d.index * 1.8)
+        .attr("transform", d => `translate(0, ${-0.5*vis.height + labelHeight})`)
+        .attr("dy", "-0.2em")
 
     const pie = vis.chartArea.selectAll(".pie")
 
+    //TODO:
+    if(this.typeFiltered === null){
+      vis.chartArea.selectAll(".pie")
+          .classed("filtered");
+    } else if (this.typeFiltered[0] === "unchurned"){
+      vis.chartArea.selectAll("g.unchurned")
+          .classed("filtered");
+    } else if(this.typeFiltered[0] === "churned"){
+      vis.chartArea.selectAll("g.churned")
+          .classed("filtered");
+    }
     pie.on('mouseover', function(event, d){
       let other = null
       vis.chartArea.selectAll('.pie')
@@ -202,19 +206,25 @@ class PieChart {
           });
 
       console.log(other.data)
-      d3.select('#tooltip')
-          .style('display', 'block')
-          .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
-          .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-          // TODO
-          .html(
-              `
-              <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
-              <ul>
-                <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
-                <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
-              </ul>
-            `);
+
+      const tooltip = d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+            .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
+        //TODO: 
+        const isFiltered = d3.select(`.pie`).classed('filtered');
+        if (true) {
+          tooltip.html(
+            `
+            <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
+            <ul>
+              <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
+              <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
+            </ul>
+          `)
+        } else {
+          d3.select('#tooltip').style('display', 'none');
+        }
     })
         .on('mouseleave', function(event, d){
           d3.select('#tooltip').style('display', 'none');
@@ -222,9 +232,9 @@ class PieChart {
               .classed("active", g => {
                 if (g === d) {
                   const isSelect = d3.select(this).classed('select')
-                  return isSelect
+                  return isSelect;
                 } else if (g.data.name === d.data.name) {
-                  return false
+                  return false;
                 }
               })
         })

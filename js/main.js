@@ -53,10 +53,16 @@ d3.csv('data/BankChurners.csv').then(data => {
   dispatcher.on('filterCustomerType', selectedType => {
     if (selectedType.length === 0) {
       histogram.typeFiltered = null;
+      scatterPlot.typeFiltered = null;
     } else {
       histogram.typeFiltered = selectedType;
+      scatterPlot.typeFiltered = selectedType;
+      console.log(selectedType);
     }
     histogram.updateVis();
+    scatterPlot.updateVis();
   })
 
 });
+
+

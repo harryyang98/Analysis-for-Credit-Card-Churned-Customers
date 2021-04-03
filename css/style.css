@@ -1,33 +1,5 @@
 
 /* Todo: add styles */
-h1 {
-    text-align: center;
-    font-style: italic;
-    font-family: Bookman, URW Bookman L, serif;
-    font-size: 40px;
-    font-weight: 900;
-  }
-.description{
-    background-image: linear-gradient(to top, rgb(237, 242, 243),rgb(217, 240, 247));
-    height: 65px;
-    }
-text.displayXlabel
-{
-    font-size: 11px;
-}
-text.displayYlabel
-{
-    font-size: 11px;
-}
-.legend-title
-{
-    font-size: 11px;
-}
-.pieLegendText
-{
-    font-size: 11px;
-    dominant-baseline: central;
-}
 .axis line {
     fill: none;
     stroke: #ddd;
@@ -58,10 +30,13 @@ line.min
 }
 
 rect:hover {
-    stroke: rgb(7, 163, 184);
+    stroke: rgba(7, 247, 27, 0.582);
     stroke-width: 2;
 }
-
+rect.active
+{
+    fill: #9400d3;
+}
 
 path.churnedViolin
 {

@@ -88,8 +88,6 @@ class Histogram {
     // Prepare data: count number of leaders in each category
     vis.data.sort((a, b) => a[factor] - b[factor]);
     // i.e. [{ key: 'male', count: 10 }, {key: 'female', 20}
-    console.log(this.typeFiltered);
-
     // Specificy accessor functions
     vis.xValue = d => d.key;
     vis.yValue = d => d.count;
@@ -114,9 +112,6 @@ class Histogram {
     } else if(this.typeFiltered[0] === "churned"){
       vis.bins = histogram(vis.churned);
     }
-    console.log(vis.bins);
-    // console.log(vis.bins[0].length);
-
     vis.yScale.domain([0, d3.max(vis.bins, function(d) { return d.length; })]);
 
     vis.displayText = () => {
