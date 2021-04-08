@@ -18,12 +18,13 @@ class PieChart {
     this.dispatcher = _dispatcher;
     this.factor = "Gender";
     this.list=[];
-    this.typeFiltered = null;
     this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
     this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
+    this.typeFiltered = null;
+    this.selectCategory = [];
     this.initVis();
   }
-  
+
   initVis() {
     // Create SVG area, initialize scales and axes
     let vis = this;
@@ -63,8 +64,7 @@ class PieChart {
     // Prepare data and scales
     let vis= this;
     vis.list = []
-    console.log(vis.churned);
-    console.log(vis.typeFiltered);
+    console.log(vis.churned)
     vis.pieChartData_churned = d3.group(vis.churned, d => d[vis.factor]);
     vis.pieChartData_churned.forEach(d=>{
       const temp ={};
@@ -158,14 +158,24 @@ class PieChart {
 
 
     const labelHeight = 18
+    // const legend = vis.chartArea.selectAll("g.legend")
+    //     .selectAll(".pieLegend")
+    //     .data(vis.data_ready_unchurned)
+    //     .join("rect")
+    //     .attr("class", "pieLegend")
+    //     .attr("y", d => labelHeight * d.index * 1.8)
+    //     .attr("width", labelHeight)
+    //     .attr("height", labelHeight)
+    //     .attr("fill", d => vis.color(d.data.name))
+    //     .attr("transform", `translate(0, ${-0.5*vis.height})`)
     const legend = vis.chartArea.selectAll("g.legend")
         .selectAll(".pieLegend")
         .data(vis.data_ready_unchurned)
-        .join("rect")
+        .join("circle")
         .attr("class", "pieLegend")
-        .attr("y", d => labelHeight * d.index * 1.8)
-        .attr("width", labelHeight)
-        .attr("height", labelHeight)
+        .attr("cy", d => labelHeight * d.index)
+        .attr("cx", 0)
+        .attr("r", 5)
         .attr("fill", d => vis.color(d.data.name))
         .attr("transform", `translate(0, ${-0.5*vis.height})`)
 
@@ -175,89 +185,101 @@ class PieChart {
         .join("text")
         .attr("class", "pieLegendText")
         .text(d => d.data.name)
-        .attr("x", labelHeight * 1.2)
-        .attr("y", d => labelHeight * d.index * 1.8)
-        .attr("transform", d => `translate(0, ${-0.5*vis.height + labelHeight})`)
-        .attr("dy", "-0.2em")
+        .attr("x", 10)
+        .attr("y", d => labelHeight * d.index)
+        .attr("transform", d => `translate(0, ${-0.5*vis.height})`)
 
     const pie = vis.chartArea.selectAll(".pie")
 
-    //TODO:
-    if(this.typeFiltered === null){
-      vis.chartArea.selectAll(".pie")
-          .classed("filtered");
-    } else if (this.typeFiltered[0] === "unchurned"){
-      vis.chartArea.selectAll("g.unchurned")
-          .classed("filtered");
-    } else if(this.typeFiltered[0] === "churned"){
-      vis.chartArea.selectAll("g.churned")
-          .classed("filtered");
-    }
     pie.on('mouseover', function(event, d){
       let other = null
       vis.chartArea.selectAll('.pie')
           .classed("active", g => {
             if (g.data.name === d.data.name) {
+              // highlight in the other pie chart
               if (g !== d) {
                 other = g
               }
               return true
             }
           });
-
-      console.log(other.data)
-
-      const tooltip = d3.select('#tooltip')
-            .style('display', 'block')
-            .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
-            .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
-        //TODO: 
-        const isFiltered = d3.select(`.pie`).classed('filtered');
-        if (true) {
-          tooltip.html(
-            `
-            <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
-            <ul>
-              <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
-              <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
-            </ul>
-          `)
-        } else {
-          d3.select('#tooltip').style('display', 'none');
-        }
+      // console.log(other.data)
+      d3.select('#tooltip')
+          .style('display', 'block')
+          .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+          .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+          // TODO
+          .html(
+              `
+              <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
+              <ul>
+                <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
+                <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
+              </ul>
+            `);
     })
         .on('mouseleave', function(event, d){
           d3.select('#tooltip').style('display', 'none');
           vis.chartArea.selectAll('.pie')
               .classed("active", g => {
                 if (g === d) {
+                  // console.log("active accroding to whether it's selected")
                   const isSelect = d3.select(this).classed('select')
-                  return isSelect;
+                  return isSelect
                 } else if (g.data.name === d.data.name) {
-                  return false;
+                  return false
                 }
+
               })
         })
         .on('click', function(event, d) {
           const isSelect = d3.select(this).classed("select")
           d3.select(this).classed('select', !isSelect);
           if (!isSelect) {
-            d3.select(this).classed('active', true)
+            // not select before
+            vis.selectCategory.push(d)
+            if (vis.selectCategory.length > 1) {
+              // having previous selected one
+              // should remove all selected
+              // console.log(vis.selectCategory[0].data)
+              vis.chartArea.selectAll(`.${vis.selectCategory[0].data.type}.pie`)
+                  .classed("select", g => {
+                    console.log("into classed case")
+                    if (g.data.name === vis.selectCategory[0].data.name) {
+                      d3.select(this).classed("select", false)
+                    }
+                  })
+                  .attr("d", d3.arc()
+                      .innerRadius(0)
+                      .outerRadius(vis.radius))
+
+
+              vis.selectCategory = []
+
+            } else {
+              d3.select(this).classed('select', true);
+            }
           } else {
-            d3.select(this).classed('active', false)
+            vis.selectCategory = []
+            d3.select(this).classed('select', false);
           }
 
+
+
           if (!isSelect) {
-            d3.select(this).attr('d', d3.arc()
-                .innerRadius(0)
-                .outerRadius(1.1*vis.radius)
-            )
-          } else {
-            d3.select(this).attr('d', d3.arc()
-                .innerRadius(0)
-                .outerRadius(vis.radius)
-            )
+            if (vis.selectCategory.length===1) {
+              d3.select(this).attr('d', d3.arc()
+                  .innerRadius(0)
+                  .outerRadius(1.1*vis.radius)
+              )
+            }
+          } else {d3.select(this).attr('d', d3.arc()
+              .innerRadius(0)
+              .outerRadius(vis.radius)
+          )
           }
+
+          console.log(vis.selectCategory)
 
         })
 

@@ -86,6 +86,11 @@ path.pie.active
     fill-opacity: 100%;
 }
 
+path.pie.select
+{
+    fill-opacity: 100%;
+}
+
 path.pie
 {
     fill-opacity: 40%;
