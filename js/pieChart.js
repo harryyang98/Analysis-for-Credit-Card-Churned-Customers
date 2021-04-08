@@ -109,10 +109,10 @@ class PieChart {
 
     // https://stackoverflow.com/questions/5963182/how-to-remove-spaces-from-a-string-using-javascript
     vis.chartArea.selectAll("g.unchurned")
-        .selectAll("path.unchurned.pie")
+        .selectAll("path.unchurned.pie.showTooltip")
         .data(vis.data_ready_unchurned)
         .join("path")
-        .attr("class", 'unchurned pie')
+        .attr("class", 'unchurned pie showTooltip')
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -123,10 +123,10 @@ class PieChart {
         .style("opacity", 1)
 
     vis.chartArea.selectAll("g.churned")
-        .selectAll("path.churned.pie")
+        .selectAll("path.churned.pie.showTooltip")
         .data(vis.data_ready_churned)
         .join("path")
-        .attr("class", 'churned pie')
+        .attr("class", 'churned pie showTooltip')
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -204,19 +204,26 @@ class PieChart {
             }
           });
       // console.log(other.data)
-      d3.select('#tooltip')
+      let tooltip = d3.select('#tooltip')
           .style('display', 'block')
           .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
           .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
           // TODO
-          .html(
-              `
+      let allow = d3.select(this).classed("showTooltip")
+      console.log(allow)
+      if (allow) {
+      tooltip.html(
+            `
               <div class="tooltip-title"> ${d.data.type} ${d.data.name}</div>
               <ul>
                 <li>Percentage: ${d3.format(".0%")(d.data.value / vis.total[d.data.type])}</li>
                 <li>Percentage in ${other.data.type}: ${d3.format(".0%")(other.data.value / vis.total[other.data.type])}</li>
               </ul>
             `);
+      } else {
+        d3.select('#tooltip').style('display', 'none');
+      }
+
     })
         .on('mouseleave', function(event, d){
           d3.select('#tooltip').style('display', 'none');
@@ -237,31 +244,41 @@ class PieChart {
           d3.select(this).classed('select', !isSelect);
           if (!isSelect) {
             // not select before
-            vis.selectCategory.push(d)
+            vis.selectCategory.push(d.data)
             if (vis.selectCategory.length > 1) {
               // having previous selected one
               // should remove all selected
               // console.log(vis.selectCategory[0].data)
-              vis.chartArea.selectAll(`.${vis.selectCategory[0].data.type}.pie`)
+              vis.chartArea.selectAll(`.${vis.selectCategory[0].type}.pie`)
                   .classed("select", g => {
-                    console.log("into classed case")
-                    if (g.data.name === vis.selectCategory[0].data.name) {
+                    if (g.data.name === vis.selectCategory[0].name) {
                       d3.select(this).classed("select", false)
                     }
                   })
                   .attr("d", d3.arc()
                       .innerRadius(0)
-                      .outerRadius(vis.radius))
+                      .outerRadius(vis.radius));
+              vis.chartArea.selectAll('path.pie')
+                  .classed("showTooltip", true)
 
 
               vis.selectCategory = []
 
             } else {
               d3.select(this).classed('select', true);
+              vis.chartArea.selectAll('path.pie')
+                  .classed("showTooltip", g => {
+                    if (g.data.name === vis.selectCategory[0].name && g.data.type === vis.selectCategory[0].type) {
+                      return true
+                    }
+                    return false
+                  });
             }
           } else {
             vis.selectCategory = []
             d3.select(this).classed('select', false);
+            vis.chartArea.selectAll('path.pie')
+                .classed("showTooltip", true);
           }
 
 
@@ -279,7 +296,9 @@ class PieChart {
           )
           }
 
+
           console.log(vis.selectCategory)
+          vis.dispatcher.call('filterInPie', event, vis.selectCategory);
 
         })
 
