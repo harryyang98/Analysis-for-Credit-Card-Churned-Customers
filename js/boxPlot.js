@@ -63,6 +63,9 @@ class BoxPlot {
         .attr('class', 'axis x-axis')
         .attr('transform', `translate(0, ${vis.height})`);
 
+    vis.mouseG = vis.chartArea.append('g')
+        .attr('class', 'mouse-over-effect')
+
 
     vis.updateVis();
   }
@@ -304,6 +307,12 @@ class BoxPlot {
 
     vis.yAxisG.call(vis.yAxis)
         .call(g => g.select('.domain').remove());
+
+    vis.mouseG.append("path") // this is the black vertical line to follow mouse
+        .attr("class", "mouse-line")
+        .style("stroke", "black")
+        .style("stroke-width", "1px")
+        .style("opacity", "0");
   }
 
 }

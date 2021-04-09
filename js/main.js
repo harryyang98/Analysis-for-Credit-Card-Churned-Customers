@@ -54,12 +54,14 @@ d3.csv('data/BankChurners.csv').then(data => {
     // dispatcher in box plot
     if (selectedType.length === 0) {
       histogram.typeFiltered = null;
+      pieChart.typeFiltered = null;
     } else {
       histogram.typeFiltered = selectedType;
+      pieChart.typeFiltered = selectedType;
       console.log(selectedType);
     }
     histogram.updateVis();
-    scatterPlot.updateVis();
+    pieChart.updateVis();
   })
   dispatcher.on('filterInPie', selectCategoryInfo => {
     // dispatcher in pie chart

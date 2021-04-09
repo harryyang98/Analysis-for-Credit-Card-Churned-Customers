@@ -112,7 +112,16 @@ class PieChart {
         .selectAll("path.unchurned.pie.showTooltip")
         .data(vis.data_ready_unchurned)
         .join("path")
-        .attr("class", 'unchurned pie showTooltip')
+        .attr("class", d => {
+          if (vis.typeFiltered === null) {
+            return 'unchurned pie showTooltip'
+
+          }
+          if (vis.typeFiltered[0] === "unchurned") {
+            return 'unchurned pie showTooltip filtered'
+          }
+          return 'unchurned pie unfiltered'
+        })
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -126,7 +135,16 @@ class PieChart {
         .selectAll("path.churned.pie.showTooltip")
         .data(vis.data_ready_churned)
         .join("path")
-        .attr("class", 'churned pie showTooltip')
+        .attr("class", d => {
+          if (vis.typeFiltered === null) {
+            return 'churned pie showTooltip'
+
+          }
+          if (vis.typeFiltered[0] === "churned") {
+            return 'churned pie showTooltip filtered'
+          }
+          return 'churned pie unfiltered'
+        })
         .attr('d', d3.arc()
             .innerRadius(0)
             .outerRadius(vis.radius)
@@ -242,7 +260,8 @@ class PieChart {
         .on('click', function(event, d) {
           const isSelect = d3.select(this).classed("select")
           d3.select(this).classed('select', !isSelect);
-          if (!isSelect) {
+          const isUnFiltered = d3.select(this).classed("unfiltered")
+          if (!isSelect && !isUnFiltered) {
             // not select before
             vis.selectCategory.push(d.data)
             if (vis.selectCategory.length > 1) {
