@@ -41,12 +41,17 @@ d3.csv('data/BankChurners.csv').then(data => {
     histogram.factor = option;
     histogram.typeFiltered = null;
     histogram.updateVis();
+    pieChart.typeFiltered = null
+    pieChart.selectCategory = null;
+    pieChart.updateVis();
   });
 
   d3.select('#cateFactor-selector').on('change', () => {
     const option = d3.select('#cateFactor-selector').property('value');
     pieChart.factor = option;
     pieChart.list = [];
+    pieChart.typeFiltered = null
+    pieChart.selectCategory = [];
     pieChart.updateVis();
   });
 
@@ -67,11 +72,13 @@ d3.csv('data/BankChurners.csv').then(data => {
     // dispatcher in pie chart
     // should link with scatterplot
     if (selectCategoryInfo.length === 0) {
-
+      histogram.typeFiltered = null;
     } else {
       // selectCategoryInfo = Array = {name, value, type}
       console.log(selectCategoryInfo)
+      // histogram.typeFiltered = [selectCategoryInfo[0].type]
     }
+    // histogram.updateVis()
   })
 
 });
