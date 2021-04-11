@@ -71,6 +71,7 @@ class PieChart {
             temp["name"] = d[0][vis.factor];
             temp["value"] = d.length;
             temp["type"] = "churned"
+            temp["category"] = vis.factor
 
             vis.list.push(temp);
         });
@@ -91,6 +92,8 @@ class PieChart {
             temp["name"] = d[0][vis.factor];
             temp["value"] = d.length;
             temp["type"] = "unchurned"
+            temp["category"] = vis.factor
+
             vis.list.push(temp);
         });
         vis.data_ready_unchurned = vis.pie(vis.list)
@@ -101,12 +104,22 @@ class PieChart {
             unchurned: vis.unchurned.length
         }
 
+        if (vis.selectCategory.length !== 0) {
+            if (vis.selectCategory[0].type !== vis.typeFiltered[0]) {
+                vis.selectCategory = []
+            } else if (vis.selectCategory[0].category !== vis.factor) {
+                vis.selectCategory = []
+            }
+        }
+
+
         vis.renderVis();
     }
 
     renderVis() {
         // Bind data to visual elements, update axes
         let vis = this;
+        console.log(vis.selectCategory)
 
         // vis.chartArea.selectAll(".pie.select")
         //     .classed("select", false);
@@ -126,9 +139,19 @@ class PieChart {
                 }
                 return vis.typeFiltered[0] !== "unchurned";
             })
+            .classed("select", d => {
+                if (vis.selectCategory.length === 0) {
+                    return false
+                }
+                if (vis.selectCategory[0].type === "unchurned" && vis.selectCategory[0].name === d.data.name) {
+                    return true
+                }
+                return false
+            })
             .attr('d', d3.arc()
-                .innerRadius(0)
-                .outerRadius(vis.radius)
+                            .innerRadius(0)
+                            .outerRadius(vis.radius)
+
             )
             .attr('fill', d => vis.color(d.data.name))
             .attr("stroke", "white")
@@ -149,9 +172,19 @@ class PieChart {
                 }
                 return vis.typeFiltered[0] !== "churned";
             })
+            .classed("select", d => {
+                if (vis.selectCategory.length === 0) {
+                    return false
+                }
+                if (vis.selectCategory[0].type === "churned" && vis.selectCategory[0].name === d.data.name) {
+                    return true
+                }
+                return false
+            })
             .attr('d', d3.arc()
-                .innerRadius(0)
-                .outerRadius(vis.radius)
+                        .innerRadius(0)
+                        .outerRadius(vis.radius)
+
             )
             .attr('fill', d => vis.color(d.data.name))
             .attr("stroke", "white")
@@ -174,6 +207,17 @@ class PieChart {
             .text(d => d)
             .attr("text-anchor", "middle")
             .attr("transform", "translate(0, -100)")
+
+        vis.chartArea.selectAll(".pie")
+            .attr('d', d3.arc()
+                .innerRadius(0)
+                .outerRadius(vis.radius))
+
+        vis.chartArea.selectAll(".select")
+            .attr('d', d3.arc()
+                .innerRadius(0)
+                .outerRadius(1.1*vis.radius))
+
 
 
 
@@ -252,9 +296,12 @@ class PieChart {
             .on('click', function(event, d) {
                 const isSelect = d3.select(this).classed("select")
                 console.log(isSelect)
-                d3.select(this).classed('select', !isSelect);
                 const isUnFiltered = d3.select(this).classed("unfiltered")
+                console.log("unfiltered:")
+                console.log(isUnFiltered)
                 if (!isSelect && !isUnFiltered) {
+                    d3.select(this).classed('select', !isSelect);
+
                     console.log("select=false and unfiltered=false")
                     // not select before
                     console.log(vis.selectCategory)
@@ -269,7 +316,12 @@ class PieChart {
                                 }
                                 return false
                             });
+                        d3.select(this).attr('d', d3.arc()
+                            .innerRadius(0)
+                            .outerRadius(1.1*vis.radius))
                     } else if (vis.selectCategory.length === 1) {
+                        d3.select(this).classed('select', !isSelect);
+
                         console.log("multiple selected types")
                         // having previous selected one
                         // should remove all selected
@@ -306,24 +358,18 @@ class PieChart {
                     d3.select(this).classed('select', false);
                     vis.chartArea.selectAll(`.${vis.selectCategory[0].type}.pie`)
                         .classed("showTooltip", true);
+                    d3.select(this).attr('d', d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(vis.radius))
                     vis.selectCategory = []
 
                 }
 
 
-
-                if (!isSelect) {
-                    if (vis.selectCategory.length===1) {
-                        d3.select(this).attr('d', d3.arc()
-                            .innerRadius(0)
-                            .outerRadius(1.1*vis.radius)
-                        )
-                    }
-                } else {d3.select(this).attr('d', d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(vis.radius)
-                )
-                }
+                // vis.chartArea.selectAll(".select")
+                //     .attr('d', d3.arc()
+                //         .innerRadius(0)
+                //         .outerRadius(1.1*vis.radius))
                 vis.dispatcher.call('filterInPie', event, vis.selectCategory);
                 console.log(vis.selectCategory)
 

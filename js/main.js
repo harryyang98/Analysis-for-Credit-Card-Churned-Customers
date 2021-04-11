@@ -50,8 +50,9 @@ d3.csv('data/BankChurners.csv').then(data => {
     const option = d3.select('#cateFactor-selector').property('value');
     pieChart.factor = option;
     pieChart.list = [];
-    pieChart.typeFiltered = null
-    pieChart.selectCategory = [];
+    if (pieChart.typeFiltered === null) {
+      pieChart.selectCategory = [];
+    }
     pieChart.updateVis();
   });
 
