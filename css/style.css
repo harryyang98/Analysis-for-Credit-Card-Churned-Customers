@@ -61,7 +61,10 @@ rect:hover {
     stroke: rgb(7, 163, 184);
     stroke-width: 2;
 }
-
+rect.active
+{
+    fill: #9400d3;
+}
 
 path.churnedViolin
 {
@@ -79,6 +82,16 @@ path.unchurnedViolin
 
 
 path.pie.active
+{
+    fill-opacity: 100%;
+}
+
+path.pie.select
+{
+    fill-opacity: 100%;
+}
+
+path.pie.filtered
 {
     fill-opacity: 100%;
 }
@@ -131,5 +144,6 @@ path.pie
 .inactive {
     fill: grey;
 }
+
 
 
