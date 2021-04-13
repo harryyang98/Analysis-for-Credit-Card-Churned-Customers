@@ -54,6 +54,8 @@ d3.csv('data/BankChurners.csv').then(data => {
       pieChart.selectCategory = [];
     }
     pieChart.updateVis();
+    scatterPlot.typeFiltered=null;
+    scatterPlot.updateVis();
   });
 
   dispatcher.on('filterCustomerType', selectedType => {
@@ -74,11 +76,14 @@ d3.csv('data/BankChurners.csv').then(data => {
     // should link with scatterplot
     if (selectCategoryInfo.length === 0) {
       histogram.typeFiltered = null;
+      scatterPlot.typeFiltered = null;
     } else {
       // selectCategoryInfo = Array = {name, value, type}
-      console.log(selectCategoryInfo)
+      console.log(selectCategoryInfo);
+      scatterPlot.typeFiltered = selectCategoryInfo;
       // histogram.typeFiltered = [selectCategoryInfo[0].type]
     }
+    scatterPlot.updateVis();
     // histogram.updateVis()
   })
 

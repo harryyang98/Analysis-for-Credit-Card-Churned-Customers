@@ -130,6 +130,11 @@ path.pie
     fill-opacity: 0.15;
 }
 
+.point.active{
+    fill: orangered;
+    fill-opacity: 0.4;
+}
+
 .legend-btn {
     stroke-width: 0.5;
     fill: orangered;

@@ -13,7 +13,7 @@ class PieChart {
             containerHeight: _config.containerWidth || 250,
             margin: _config.margin || {top: 15, right: 25, bottom: 20, left: 25},
             tooltipPadding: _config.tooltipPadding || 15
-        }
+        };
         this.data = _data;
         this.dispatcher = _dispatcher;
         this.factor = "Gender";
@@ -63,15 +63,15 @@ class PieChart {
     updateVis() {
         // Prepare data and scales
         let vis= this;
-        vis.list = []
+        vis.list = [];
         // console.log(vis.churned)
         vis.pieChartData_churned = d3.group(vis.churned, d => d[vis.factor]);
         vis.pieChartData_churned.forEach(d=>{
             const temp ={};
             temp["name"] = d[0][vis.factor];
             temp["value"] = d.length;
-            temp["type"] = "churned"
-            temp["category"] = vis.factor
+            temp["type"] = "churned";
+            temp["category"] = vis.factor;
 
             vis.list.push(temp);
         });
@@ -82,22 +82,22 @@ class PieChart {
         vis.pie = d3.pie()
             .value(d => d.value);
 
-        vis.data_ready_churned = vis.pie(vis.list)
-        console.log(vis.data_ready_churned)
+        vis.data_ready_churned = vis.pie(vis.list);
+        console.log(vis.data_ready_churned);
 
         vis.list = []
-        vis.pieChartData_unchurned = d3.group(vis.unchurned, d => d[vis.factor])
+        vis.pieChartData_unchurned = d3.group(vis.unchurned, d => d[vis.factor]);
         vis.pieChartData_unchurned.forEach(d=>{
             const temp ={};
             temp["name"] = d[0][vis.factor];
             temp["value"] = d.length;
-            temp["type"] = "unchurned"
-            temp["category"] = vis.factor
+            temp["type"] = "unchurned";
+            temp["category"] = vis.factor;
 
             vis.list.push(temp);
         });
-        vis.data_ready_unchurned = vis.pie(vis.list)
-        console.log(vis.data_ready_unchurned)
+        vis.data_ready_unchurned = vis.pie(vis.list);
+        console.log(vis.data_ready_unchurned);
 
         vis.total = {
             churned: vis.churned.length,
@@ -119,7 +119,7 @@ class PieChart {
     renderVis() {
         // Bind data to visual elements, update axes
         let vis = this;
-        console.log(vis.selectCategory)
+        console.log(vis.selectCategory);
 
         // vis.chartArea.selectAll(".pie.select")
         //     .classed("select", false);
@@ -155,7 +155,7 @@ class PieChart {
             )
             .attr('fill', d => vis.color(d.data.name))
             .attr("stroke", "white")
-            .style("stroke-width", "2px")
+            .style("stroke-width", "2px");
 
         vis.chartArea.selectAll("g.churned")
             .selectAll("path.churned.pie")
@@ -188,7 +188,7 @@ class PieChart {
             )
             .attr('fill', d => vis.color(d.data.name))
             .attr("stroke", "white")
-            .style("stroke-width", "2px")
+            .style("stroke-width", "2px");
 
         vis.chartArea.selectAll("g.unchurned")
             .selectAll("text.unchurned")
@@ -197,7 +197,7 @@ class PieChart {
             .attr("class", "unchurned")
             .text(d => d)
             .attr("text-anchor", "middle")
-            .attr("transform", "translate(0, -100)")
+            .attr("transform", "translate(0, -100)");
 
         vis.chartArea.selectAll("g.churned")
             .selectAll("text.churned")
@@ -206,23 +206,23 @@ class PieChart {
             .attr("class", "churned")
             .text(d => d)
             .attr("text-anchor", "middle")
-            .attr("transform", "translate(0, -100)")
+            .attr("transform", "translate(0, -100)");
 
         vis.chartArea.selectAll(".pie")
             .attr('d', d3.arc()
                 .innerRadius(0)
-                .outerRadius(vis.radius))
+                .outerRadius(vis.radius));
 
         vis.chartArea.selectAll(".select")
             .attr('d', d3.arc()
                 .innerRadius(0)
-                .outerRadius(1.1*vis.radius))
+                .outerRadius(1.1*vis.radius));
 
 
 
 
 
-        const labelHeight = 18
+        const labelHeight = 18;
         const legend = vis.chartArea.selectAll("g.legend")
             .selectAll(".pieLegend")
             .data(vis.data_ready_unchurned)
@@ -232,7 +232,7 @@ class PieChart {
             .attr("cx", 0)
             .attr("r", 5)
             .attr("fill", d => vis.color(d.data.name))
-            .attr("transform", `translate(0, ${-0.5*vis.height})`)
+            .attr("transform", `translate(0, ${-0.5*vis.height})`);
 
         const legendText = vis.chartArea.selectAll("g.legend")
             .selectAll(".pieLegendText")
@@ -242,9 +242,9 @@ class PieChart {
             .text(d => d.data.name)
             .attr("x", 10)
             .attr("y", d => labelHeight * d.index)
-            .attr("transform", d => `translate(0, ${-0.5*vis.height})`)
+            .attr("transform", d => `translate(0, ${-0.5*vis.height})`);
 
-        const pie = vis.chartArea.selectAll(".pie")
+        const pie = vis.chartArea.selectAll(".pie");
 
         pie.on('mouseover', function(event, d){
             let other = null
@@ -262,9 +262,9 @@ class PieChart {
             let tooltip = d3.select('#tooltip')
                 .style('display', 'block')
                 .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
-                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
             // TODO
-            let allow = d3.select(this).classed("showTooltip")
+            let allow = d3.select(this).classed("showTooltip");
             if (allow) {
                 tooltip.html(
                     `
@@ -285,7 +285,7 @@ class PieChart {
                     .classed("active", g => {
                         if (g === d) {
                             // console.log("active accroding to whether it's selected")
-                            const isSelect = d3.select(this).classed('select')
+                            const isSelect = d3.select(this).classed('select');
                             return isSelect
                         } else if (g.data.name === d.data.name) {
                             return false
@@ -294,20 +294,20 @@ class PieChart {
                     })
             })
             .on('click', function(event, d) {
-                const isSelect = d3.select(this).classed("select")
-                console.log(isSelect)
-                const isUnFiltered = d3.select(this).classed("unfiltered")
-                console.log("unfiltered:")
-                console.log(isUnFiltered)
+                const isSelect = d3.select(this).classed("select");
+                console.log(isSelect);
+                const isUnFiltered = d3.select(this).classed("unfiltered");
+                console.log("unfiltered:");
+                console.log(isUnFiltered);
                 if (!isSelect && !isUnFiltered) {
                     d3.select(this).classed('select', !isSelect);
 
-                    console.log("select=false and unfiltered=false")
+                    console.log("select=false and unfiltered=false");
                     // not select before
-                    console.log(vis.selectCategory)
+                    console.log(vis.selectCategory);
                     if (vis.selectCategory.length === 0) {
-                        console.log("Only one selected type, set select=true")
-                        vis.selectCategory.push(d.data)
+                        console.log("Only one selected type, set select=true");
+                        vis.selectCategory.push(d.data);
                         d3.select(this).classed('select', true);
                         vis.chartArea.selectAll('path.pie')
                             .classed("showTooltip", g => {
@@ -322,7 +322,7 @@ class PieChart {
                     } else if (vis.selectCategory.length === 1) {
                         d3.select(this).classed('select', !isSelect);
 
-                        console.log("multiple selected types")
+                        console.log("multiple selected types");
                         // having previous selected one
                         // should remove all selected
                         // console.log(vis.selectCategory[0].data)
@@ -336,40 +336,23 @@ class PieChart {
                                 .innerRadius(0)
                                 .outerRadius(vis.radius));
                         vis.chartArea.selectAll('path.pie')
-                            .classed("showTooltip", true)
+                            .classed("showTooltip", true);
 
 
                         vis.selectCategory = []
                     }
 
-                    // } else  {
-                    //     console.log("Only one selected type, set select=true")
-                    //     vis.selectCategory.push(d.data)
-                    //     d3.select(this).classed('select', true);
-                    //     vis.chartArea.selectAll('path.pie')
-                    //         .classed("showTooltip", g => {
-                    //             if (g.data.name === vis.selectCategory[0].name && g.data.type === vis.selectCategory[0].type) {
-                    //                 return true
-                    //             }
-                    //             return false
-                    //         });
-                    // }
                 } else if (isSelect) {
                     d3.select(this).classed('select', false);
                     vis.chartArea.selectAll(`.${vis.selectCategory[0].type}.pie`)
                         .classed("showTooltip", true);
                     d3.select(this).attr('d', d3.arc()
                         .innerRadius(0)
-                        .outerRadius(vis.radius))
+                        .outerRadius(vis.radius));
                     vis.selectCategory = []
 
                 }
 
-
-                // vis.chartArea.selectAll(".select")
-                //     .attr('d', d3.arc()
-                //         .innerRadius(0)
-                //         .outerRadius(1.1*vis.radius))
                 vis.dispatcher.call('filterInPie', event, vis.selectCategory);
                 console.log(vis.selectCategory)
 

@@ -18,10 +18,9 @@ class ScatterPlot {
       legendRadius: 5
     };
     this.data = _data;
-    //this.unchurned = _data.filter(d => d.Attrition_Flag === "Existing Customer");
-    //this.churned = _data.filter(d => d.Attrition_Flag === "Attrited Customer");
     this.filteredData = _data.filter(d => d['Customer_Age']>=21 && d['Customer_Age']<=30);
     this.selectedArray = "temp-20";
+    this.typeFiltered = null;
     this.initVis();
   }
   
@@ -112,7 +111,18 @@ class ScatterPlot {
     const circles = vis.chartArea.selectAll('.point')
         .data(vis.filteredData)
         .join('circle')
-        .attr('class', 'point')
+        .attr('class', d=>{
+            if(this.typeFiltered===null){
+                return `point`
+            }else if((this.typeFiltered[0].type==="churned" && d['Attrition_Flag'] === "Attrited Customer")||(this.typeFiltered[0].type==="unchurned" && d['Attrition_Flag'] === "Existing Customer")){
+                if(this.typeFiltered[0].name === d[this.typeFiltered[0].category]){
+                    return `point active`
+                }else{
+                    return `point`
+                }
+            }
+            return `point`
+        })
         .attr('r', 2)
         .attr('cy', d => vis.yScale(vis.yValue(d)))
         .attr('cx', d => vis.xScale(vis.xValue(d)));
@@ -176,7 +186,7 @@ class ScatterPlot {
         .join("text")
         .attr("class", "legend-title")
         .text(d=>d)
-        .attr("dy", "-1em")
+        .attr("dy", "-1em");
 
     // for each legend, draw a circle
     const leg =vis.legendArea.selectAll('circle')
