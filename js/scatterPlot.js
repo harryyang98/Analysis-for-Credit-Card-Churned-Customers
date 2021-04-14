@@ -9,13 +9,13 @@ class ScatterPlot {
   constructor(_config, _data) {
     this.config = {
       parentElement: _config.parentElement,
-      containerWidth: _config.containerWidth || 750,
-      containerHeight: _config.containerWidth || 250,
+      containerWidth: _config.containerWidth || 950,
+      containerHeight: _config.containerWidth || 350,
       margin: _config.margin || {top: 40, right: 25, bottom: 20, left: 50},
       tooltipPadding: _config.tooltipPadding || 15,
       legendWidth: 170,
       legendHeight: 8,
-      legendRadius: 5
+      legendRadius: 6
     };
     this.data = _data;
     this.filteredData = _data.filter(d => d['Customer_Age']>=21 && d['Customer_Age']<=30);
@@ -61,7 +61,7 @@ class ScatterPlot {
         .attr("dy", "-.5em");
     vis.yAxisTitle = vis.chartArea.append("g")
         .attr("class", "x-axis-title")
-        .attr("transform", "translate(-15, -20)")
+        .attr("transform", "translate(-10, -20)")
     vis.yAxisTitle
         .append("text")
         .text("Total transaction")
@@ -123,7 +123,7 @@ class ScatterPlot {
             }
             return `point`
         })
-        .attr('r', 2)
+        .attr('r', 2.5)
         .attr('cy', d => vis.yScale(vis.yValue(d)))
         .attr('cx', d => vis.xScale(vis.xValue(d)));
 

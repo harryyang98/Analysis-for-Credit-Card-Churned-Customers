@@ -9,7 +9,7 @@ class BoxPlot {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: 350,
-      containerHeight: 350,
+      containerHeight: 330,
       barWidth: 10,
       margin: { top: 25, right: 10, bottom: 20, left: 65 },
       tooltipPadding: _config.tooltipPadding || 25
