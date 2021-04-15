@@ -42,7 +42,7 @@ d3.csv('data/BankChurners.csv').then(data => {
     histogram.typeFiltered = null;
     histogram.updateVis();
     pieChart.typeFiltered = null
-    pieChart.selectCategory = null;
+    pieChart.selectCategory = [];
     pieChart.updateVis();
   });
 

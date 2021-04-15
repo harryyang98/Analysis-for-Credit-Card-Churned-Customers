@@ -83,7 +83,6 @@ class PieChart {
             .value(d => d.value);
 
         vis.data_ready_churned = vis.pie(vis.list);
-        console.log(vis.data_ready_churned);
 
         vis.list = []
         vis.pieChartData_unchurned = d3.group(vis.unchurned, d => d[vis.factor]);
@@ -97,7 +96,6 @@ class PieChart {
             vis.list.push(temp);
         });
         vis.data_ready_unchurned = vis.pie(vis.list);
-        console.log(vis.data_ready_unchurned);
 
         vis.total = {
             churned: vis.churned.length,
@@ -119,7 +117,6 @@ class PieChart {
     renderVis() {
         // Bind data to visual elements, update axes
         let vis = this;
-        console.log(vis.selectCategory);
 
         // vis.chartArea.selectAll(".pie.select")
         //     .classed("select", false);

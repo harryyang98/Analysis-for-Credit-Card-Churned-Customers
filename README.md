@@ -10,6 +10,8 @@ Reference:
 * [Scatterplot](https://stackoverflow.com/questions/13669239/remove-end-ticks-from-d3-js-axis)
 * [PieChart](https://www.d3-graph-gallery.com/graph/pie_changeData.html)
 
+Screen size: 1025px x 690px
+
 ## `boxPlot.js`
 
 Contains the implementation for boxplot and violin plot. We put them together in one `js` file because they are sharing the axes.
