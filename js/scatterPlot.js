@@ -141,6 +141,7 @@ class ScatterPlot {
                 <li>Attrition_Flag: ${d['Attrition_Flag']}</li>
                 <li>Age: ${d['Customer_Age']}</li>
                 <li>Dependent_count: ${d['Dependent_count']}</li>
+                <li>Average transaction amount: ${d['Total_Trans_Amt']/d['Total_Trans_Ct']}</li>
               </ul>
             `);
         })
